@@ -7,7 +7,7 @@ Charul Passey · July 2026 · 5 minute read
 
 Everyone has a take on AI spending. Most takes share a flaw: they describe the spend and stop there. This memo is about what happens after you can see the number.
 
-Start with what the data says. Half of U.S. businesses now pay for AI services, 50.4% as of March, nearly double a year ago.¹ Average monthly token spend has grown 13x since January 2025.² Twelve-month retention on AI products reached 83.6%, up from 51% in 2022.³ This is no longer an experiment line. It is a permanent budget category, and the fastest-growing one on record.
+Start with what the data says. More than half of U.S. businesses now pay for AI services, 54.2% as of May, nearly double a year ago.¹ Average monthly token spend has grown 13x since January 2025.² Twelve-month retention on AI products reached 83.6%, up from 51% in 2022.³ This is no longer an experiment line. It is a permanent budget category, and the fastest-growing one on record.
 
 Now look at how that category is managed. AI charges are leaking onto personal cards and returning as reimbursements, up 3x year over year.⁴ The spread between median and top-quartile spenders runs 4x to 15x depending on the vendor.⁴ The most sophisticated control publicly deployed at enterprise scale is a flat monthly cap per employee.⁵ Two-thirds of businesses using generative AI already run more than one tool, and in most of them nobody owns the category: finance, IT, and department heads each hold a piece.⁴
 
@@ -29,7 +29,7 @@ Governance is a context problem before it is a software problem. A policy engine
 
 The providers themselves are pulling in this direction. Model vendors are investing in spend visibility, predictability tooling, and programmatic budget controls, because in usage-based models, bill shock is a churn event. Their monetization teams describe a future of agents operating inside cost envelopes at a scale no human can administer by hand.⁹ A governance layer is not adversarial to the vendors. It is the demand-side counterpart of infrastructure they are already building, which is why they expose the telemetry that makes it possible.
 
-There is a second advantage, quieter but durable: benchmarks. Thousands of companies' anonymized policies reveal what loose, normal, and strict actually look like at every size and sector. Travel policy benchmarks exist today for exactly this reason.⁸ AI spend policy benchmarks do not exist yet. The first publisher sets the defaults for an entire category, and defaults are strategy.
+There is a second advantage, quieter but durable: benchmarks. Spend benchmarks for AI already exist. The AI Index publishes median AI spend per employee by sector, size, and financing status, and the distribution it reveals is the whole story: the median company spends $11 per employee per month while the top decile's median is $611, a 54x gap.¹ Policy benchmarks are the missing layer: what rules companies actually set around that spend, what loose, normal, and strict look like at every size and sector. Travel policy benchmarks exist today for exactly this reason.⁸ AI spend policy benchmarks do not exist yet. The first publisher sets the defaults for an entire category, and defaults are strategy.
 
 ## Why the window is now
 
@@ -50,7 +50,8 @@ The pattern in this industry has repeated for forty years: a new spend category 
 ---
 
 **Sources**
-1, 2. Ramp Economics Lab, Business Spending Report, Spring 2026.
+1. Ramp AI Index, ramp.com/data, May 2026.
+2. Ramp Economics Lab, Business Spending Report, Spring 2026.
 3. Ramp Economics Lab, Business Spending Report, Winter 2026.
 4. Ramp, How to Buy AI: 5 Tips for Every Finance Leader, 2026.
 5. TechCrunch, June 2026, reporting an enterprise per-employee AI budget cap.

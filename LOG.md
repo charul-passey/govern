@@ -1,2 +1,7 @@
-DAY 1 - watching Anthropic's monetization lead at Stripe Sessions say manual agent budgets won't be humanly possible, and realizing the buyer's half of that sentence didn't exist.
+SESSION 0
+"Watching Anthropic's monetization lead at Stripe Sessions say manual agent budgets won't be humanly possible, and realizing the buyer's half of that sentence didn't exist"
+I added the spec, govern, memo, and claude.md files. Ran through the first prompt - "Read CLAUDE.md and GOVERN_SPEC.md fully before doing anything. Then scaffold the project per the spec: Next.js 14 App Router, TypeScript strict, Tailwind configured with the design tokens from CLAUDE.md as a theme. Create empty section components for Hero, Problem, Demo, Instruments, and Footer, and empty routes for /memo, /build-log, and api/generate-policy. No content, no styling beyond tokens. Show me the file tree and your tailwind.config.ts before installing or writing anything." and deployed to vercel at govern.vercel.app with a blank skeleton
 
+SESSION 1
+"Day 1, second pass: Claude Code paraphrased locked copy because the final version lived in chat, not in the repo. Root cause: incomplete context, not a disobedient agent. Fix: promoted copy to a locked content file with a render-verbatim rule. Lesson: the agent executes the context it has; gaps get filled with improvisation. Also caught a drifted footnote that accidentally turned neutral framing into a competitive jab — the kind of error only a human reading with stakes would catch."
+Made a lot more changes post adding the Ramp AI Index May 2026 data and the project got its emperical spine

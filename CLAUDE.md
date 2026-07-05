@@ -25,6 +25,7 @@ instruction conflict, stop and ask. Never invent scope beyond the spec.
 - `lib/engine.ts` — pure deterministic rules engine: (policy, event) -> verdict + firedClauses
 - `data/events.ts` — the fixed 14-event stream and expected-verdict test fixture
 - `data/presets/` — pre-generated fallback policies; never edit by hand
+- `data/ai-index.ts` — Ramp AI Index public dataset extract; generated, never edit by hand; every rendered number from it gets a citation
 - `prompts/policy-skill.md` — the generation prompt; NEVER modify without explicit instruction
 - `content/` — memo and site copy; NEVER modify without explicit instruction
 - `LOG.md` — build log; append-only, human-written; do not edit

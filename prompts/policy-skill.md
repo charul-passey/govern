@@ -43,7 +43,8 @@ Shape (all money in integer USD unless suffixed _pct or _hours):
   "budgets": {
     "company_envelope_usd_month": number,
     "team_envelopes": [ { "team": string, "usd_month": number, "variance_band_pct": number, "unit_cost_metric": string } ],
-    "burn_alert_pct": number       // % of envelope consumed that triggers pacing alert
+    "burn_alert_pct": number,      // % of envelope consumed that triggers pacing alert
+    "benchmark": { "sector_median_per_employee_usd": number, "envelope_multiple_of_median": number, "source": "Ramp AI Index, ramp.com/data, May 2026" }
   },
   "agents": {
     "max_retries_per_task": number,
@@ -111,21 +112,39 @@ strict: self_serve false, approver "CFO", window 24h, max_delta 50-150
 APPROVAL THRESHOLDS (fine_tune_over_usd)
 loose 10000-25000 · normal 3000-8000 · strict 500-2000
 
-COMPANY ENVELOPE (usd/month), guidance by headcount x maturity, then scale by sector:
-| headcount | experimenting | scaling  | dependent |
-| 1-25      | 500-2k        | 2k-8k    | 8k-25k    |
-| 26-100    | 2k-6k         | 8k-30k   | 30k-90k   |
-| 101-500   | 5k-15k        | 25k-90k  | 90k-300k  |
-| 501-2000  | 10k-30k       | 60k-200k | 250k-800k |
-| 2000+     | 25k-80k       | 150k-500k| 600k-2M   |
-Sector multiplier: ai_native x2-3 · software x1 · services x0.7 · retail x0.5 ·
-manufacturing x0.4 · healthcare x0.6 (healthcare also forces data_terms_reviewed true
-for all allowlisted providers and new_provider_rule "require_approval" or "block").
+COMPANY ENVELOPE (usd/month): anchor to the Ramp AI Index benchmarks (May 2026 release).
+Method: envelope = midpoint_headcount x benchmark_per_employee x maturity_multiplier.
+benchmark_per_employee: take the sector median below; if the company is VC-backed
+ai_native, use the VC-backed figure instead when it is higher.
+Sector medians, USD per employee per month (Ramp AI Index, May 2026):
+  Technology and media 66.29 · Finance and insurance 36.36 ·
+  Professional/scientific/technical services 26.83 · Retail 8.00 ·
+  Manufacturing 7.69 · Construction 4.15 · Health care 2.86 ·
+  Accommodation and food services 1.78
+Size medians (context, note the inversion): Small 21.33 · Medium 7.94 · Large 2.30.
+Financing: VC-backed 69.67 · PE-backed 7.60 · Other 7.27.
+Distribution context: overall median 11.38, top-decile median 610.61, top-1% 7,448.85.
+maturity_multiplier: experimenting 0.5x · scaling 2x · dependent 6-10x. The wide
+dependent multiplier is justified by the observed 54x median-to-top-decile spread;
+a policy must fund the winners, then govern the variance around them.
+Round envelopes to two significant figures. Sanity floor 300/month, ceiling 2M/month.
+healthcare: force data_terms_reviewed true for all allowlisted providers and
+new_provider_rule "require_approval" or "block".
+BENCHMARK CONTEXT REQUIREMENT: populate budgets.benchmark (see schema) with the sector
+median you used and the envelope's multiple of it, and reference that multiple in
+meta.summary (e.g. "envelopes set at 2.1x sector median"). Every generated policy must
+be traceable to the public benchmark it was calibrated against.
 
 TEAM ENVELOPES: derive 3-5 teams appropriate to the sector (software: Engineering,
 Product, Support, GTM, Data). Sum of team envelopes = 85-95% of company envelope.
 Unit cost metrics must be operational, never per-token: "cost per resolved ticket",
 "cost per merged PR", "cost per qualified lead", "cost per shipped design".
+
+SPEND MIX CONTEXT (May 2026, for rationale flavor and classification rules):
+API usage is the largest AI spend type at large companies (53%); chat and coding agent
+subscriptions are proportionally larger at small companies (17% combined). Classification
+rules should treat API usage, chat subscriptions, and coding agent subscriptions as
+distinct lines when writing rules and rationales.
 
 ## Style rules for all strings
 - No em dashes or en dashes. No "not X, but Y" constructions. No hedging.

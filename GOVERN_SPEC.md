@@ -41,11 +41,7 @@ Route: `govern.charulpassey.com` (Vercel). Single scrolling page, sections below
 - Tiny disclaimer line in footer of hero: "An independent concept project. Not affiliated with Ramp. Data cited from Ramp Economics Lab publications."
 
 ### §1 The problem (data wall, ~1 viewport)
-Four stat cards + one micro-chart, every number cited (superscript → footnotes):
-- **13×** — growth in average monthly AI token spend since Jan 2025 (Ramp Economics Lab, Spring 2026 report)
-- **50.4%** — share of U.S. businesses paying for AI (Ramp AI Index, Mar 2026)
-- **3×** — YoY growth in AI-related reimbursements = shadow AI on personal cards (Ramp, "How to buy AI")
-- **4–15×** — top-quartile vs median AI spend variance by vendor (same source)
+Four stat cards + one real-data chart, every number cited; all copy verbatim from content/site-copy.md. Cards: 13× token spend growth; 54.2% adoption (AI Index, May 2026); 3× shadow-AI reimbursements; 54× median-to-top-decile gap in monthly AI spend per employee (AI Index dataset: $11.38 vs $610.61). Chart between cards and body: Ramp AI Index vs U.S. Census BTOS, Jan 2023–May 2026, rendered from data/ai-index.ts with a source line. Recreated from their downloadable CSV, never a screenshot of their chart.
 Then the argument in 3 short paragraphs: seat-based budgeting assumes humans initiate spend at human speed; token billing is machine-initiated, volatile, and invisible to every control built for the first two pillars (people, vendors). The state of the art for control today is a flat per-employee cap — a seat-era instrument aimed at a usage-era problem. Visibility products (including Ramp's own, April 2026) solved *seeing*. Nobody has solved *governing*.
 
 ### §2 The product — Govern demo (the heart, ~60% of build effort)
@@ -60,6 +56,7 @@ Three-step interactive flow, all client-visible state, no login.
 - **Left pane: human-readable policy** — reads like a page from Ramp's expense-policy ebook. Sections: Providers & models; Budgets & variance bands; Agent guardrails; Shadow-AI rules; Classification (COGS vs OpEx); Approvals; Anomaly response ladder.
 - **Right pane: the same policy as machine-readable JSON** ("policy-as-code") — the point being *this* is what an enforcement agent actually consumes. Toggle loose/normal/strict re-generates with visible diffs.
 - Design note: two-pane layout mirrors Ramp's bill-pay UI (document left, structured data right).
+- **Benchmark chips:** each team envelope and the company envelope render a small context chip, e.g. "2.1× sector median", populated from budgets.benchmark in the policy JSON, values traceable to data/ai-index.ts (Ramp AI Index, May 2026). This is the visible thread from Ramp's public data into every generated policy.
 
 Policy dimensions (the schema — see §5):
 1. **Provider & model allowlist** with default-tier routing rule (cheap model by default, frontier by exception — echoes the 90/10 routing pattern Ramp has described publicly for its own stack).
@@ -124,6 +121,7 @@ About Charul (2 lines + photo optional), links: resume PDF, LinkedIn, charulpass
 - **`/api/generate-policy`:** Vercel serverless route → Anthropic Messages API (`claude-sonnet-4-6`). System prompt lives in `prompts/policy-skill.md` — written like a Ramp "skill": role, schema, calibration tables for loose/normal/strict by company size/sector, 2 few-shot examples, hard rule: JSON only. Also returns per-event rationale strings for the fixed event stream (single call, structured output).
 - **Rules engine:** `lib/engine.ts` — pure function `(policy, event) → verdict + firedClauses[]`. 100% unit-tested (this is the TDD teaching session).
 - **Event stream:** `data/events.ts` — authored, not generated; ~14 events with realistic merchants/models/amounts. Synthetic but plausible; no real company data.
+- **AI Index data:** `data/ai-index.ts` — generated extract of the Ramp AI Index public dataset (May 2026): headline adoption series (Ramp vs Census), benchmark constants (spend per employee by sector/size/financing, percentile spreads, provider adoption, spend mix). Powers the §1 chart, the benchmark chips in generated policies, and the policy skill's envelope calibration. Never hand-edited; regenerate from the CSV bundle.
 - **Caching/fallback:** 3 preset policies + rationales pre-generated at build time into `data/presets/`. Client uses live API when available; silent fallback otherwise. Rate-limit the route (IP-based, generous) to keep her API bill at pennies.
 - **Analytics:** Vercel Analytics + a few custom events (policy generated, simulator completed, memo opened, build-log opened) — so Charul can see whether Ramp visitors reach the payoff.
 - **OG/meta:** custom OG image (hero statement on white with yellow bar) — the link preview a recruiter forwards IS the first impression.
@@ -148,7 +146,7 @@ Write Zod policy schema; author `events.ts`; have Claude Code write engine tests
 *Learn:* TDD with an agent — specifying behavior instead of code.
 
 **Session 3 — The policy skill & API route (1–1.5 days)**
-Author `policy-skill.md` (we draft together in chat first), build the route, structured-output validation, retry/fallback logic, generate the 3 presets, wire loose/normal/strict calibration.
+Author `policy-skill.md` (drafted in chat; envelope calibration is benchmark-anchored to data/ai-index.ts values), build the route, structured-output validation, retry/fallback logic, generate the 3 presets, wire loose/normal/strict calibration. Eval check: every generated policy's budgets.benchmark values must match the constants in data/ai-index.ts.
 *Learn:* prompt/skill engineering for reliable structured JSON; eval-by-hand: generate 10 policies, grade them, tighten the skill.
 
 **Session 4 — Demo UI (2 days)**
