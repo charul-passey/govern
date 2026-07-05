@@ -10,15 +10,22 @@ export function Hero() {
       <div className="mx-auto max-w-shell">
         <div className="max-w-prose">
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-6xl">
-            Every company just acquired a third payroll. Nobody’s managing it.
+            Every company just hired a third workforce. Nobody’s managing its
+            budget.
           </h1>
 
-          <p className="mt-6 max-w-prose text-lg leading-relaxed text-ink/70 sm:text-xl">
-            AI is the fastest-growing, most under-managed spend category in
-            business. Seeing it was chapter one. Govern is a working concept for
-            chapter two: policy, budgets, and enforcement for intelligence bought
-            by the token.
-          </p>
+          <div className="mt-6 max-w-prose space-y-4 text-lg leading-relaxed text-ink/70 sm:text-xl">
+            <p>
+              AI is the fastest-growing, most under-managed spend category in
+              business. It’s initiated by software, billed by the token, and
+              invisible to every control built for people and vendors. Seeing it
+              was chapter one.
+            </p>
+            <p>
+              Govern is a working concept for chapter two: policy, budget
+              instruments, and enforcement for intelligence.
+            </p>
+          </div>
 
           <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <a
@@ -37,11 +44,6 @@ export function Hero() {
 
           <p className="mt-8 font-mono text-sm text-ink/60">
             built in {days} {dayLabel} · one PM · working demo below
-          </p>
-
-          <p className="mt-16 text-xs text-ink/60">
-            An independent concept project. Not affiliated with Ramp. Data cited
-            from Ramp Economics Lab publications.
           </p>
         </div>
       </div>
