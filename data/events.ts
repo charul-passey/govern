@@ -55,6 +55,7 @@ export interface Event {
   projectedSavingsUsdYear?: number;
   envelopePct?: number;
   daysRemaining?: number;
+  projectedOvernightUsd?: number;
 
   // Test fixture, asserted against engine output.
   expectedVerdict: Verdict;
@@ -132,6 +133,7 @@ export const events: Event[] = [
     team: "Growth",
     retries: 340,
     usdPerHour: 47,
+    projectedOvernightUsd: 1090,
     expectedVerdict: "blocked",
     expectedClauses: [
       "agents.max_retries_per_task",
