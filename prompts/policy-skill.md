@@ -110,10 +110,23 @@ normal: self_serve false, approver "Engineering lead", window 72h, max_delta 100
 strict: self_serve false, approver "CFO", window 24h, max_delta 50-150
 
 APPROVAL THRESHOLDS (fine_tune_over_usd)
-loose 10000-25000 · normal 3000-8000 · strict 500-2000
+loose 10000-25000 · normal 3000-4500 · strict 500-2000
+(The normal ceiling of 4500 is deliberate: event e5's 4,800 fine-tune must trigger
+approval_recommended at normal strictness. At loose it passes silently by design;
+that contrast is the strictness story.)
 
 COMPANY ENVELOPE (usd/month): anchor to the Ramp AI Index benchmarks (May 2026 release).
-Method: envelope = midpoint_headcount x benchmark_per_employee x maturity_multiplier.
+Headcount midpoints (use EXACTLY these): 1-25 -> 15 · 26-100 -> 60 · 101-500 -> 300 ·
+501-2000 -> 1200 · 2000+ -> 4000.
+Profile sector -> benchmark row mapping (use EXACTLY this):
+software -> Technology and media · ai_native -> Technology and media (or VC-backed
+69.67 if higher and profile is VC-backed) · services -> Professional, scientific, and
+technical services · retail -> Retail · manufacturing -> Manufacturing ·
+healthcare -> Health care.
+Method: envelope = midpoint x sector_median x maturity_multiplier. Then set
+benchmark.envelope_multiple_of_median = envelope / (midpoint x sector_median), rounded
+to one decimal, and use THAT SAME figure in meta.summary. The three numbers must
+reconcile exactly; a reader will divide them.
 benchmark_per_employee: take the sector median below; if the company is VC-backed
 ai_native, use the VC-backed figure instead when it is higher.
 Sector medians, USD per employee per month (Ramp AI Index, May 2026):
@@ -147,6 +160,9 @@ rules should treat API usage, chat subscriptions, and coding agent subscriptions
 distinct lines when writing rules and rationales.
 
 ## Style rules for all strings
+- Response ladder owners must escalate across roles: step 1 a team-level owner, step 2
+  an engineering or finance lead, step 3 a finance owner (CFO or Controller). Approvers
+  and owners should not all be the same title.
 - No em dashes or en dashes. No "not X, but Y" constructions. No hedging.
 - Plain, controller-grade language. Numbers do the talking.
 - Team names and approver titles must be plausible for the profile.
@@ -167,11 +183,12 @@ e1/e2 routine passes: cite the clause that admits them, keep it quiet.
 e3 variance: name a plausible technical cause and the band it breached.
 e4 shadow sub: cite the threshold count and the contract it reroutes to.
 e5 fine-tune: list nothing; the checklist UI handles it. One approving sentence.
-e6 loop block: cite YOUR retry limit and kill threshold, state prevented overnight burn.
+e6 loop block: cite YOUR retry limit and kill threshold. The prevented-burn figure is
+canonically $1,090; use exactly that figure.
 e7 exception: cite the window and delta cap. Approving tone.
 e8 throttle: cite ladder step 2 and the preserved experimentation carve-out.
 e9 agent card purchase: cite scope and ceiling.
-e10 consolidation: cite overlap and the annualized savings.
+e10 consolidation: cite the overlap. The annualized savings figure is canonically $840 (unused seat value on the existing contract); use exactly that figure.
 e11 new provider: cite the rule and the questionnaire step. Neutral tone.
 e12 reclassification: cite the tag rule. Dry tone.
 e13 burn pacing: cite burn_alert_pct and days remaining. No alarm.

@@ -1,0 +1,178 @@
+{
+  "profile": {
+    "company_name": "Industrial mfg",
+    "headcount_band": "501-2000",
+    "sector": "manufacturing",
+    "ai_maturity": "experimenting",
+    "strictness": "strict"
+  },
+  "policy": {
+    "meta": {
+      "company_name": "Industrial mfg",
+      "strictness": "strict",
+      "summary": "Strict AI spend policy for a 501-2000 headcount manufacturer experimenting with AI, envelopes set at 1.8x sector median with CFO approval required for frontier exceptions."
+    },
+    "providers": {
+      "allowlist": [
+        {
+          "name": "Anthropic",
+          "tier": "primary",
+          "data_terms_reviewed": true
+        },
+        {
+          "name": "OpenAI",
+          "tier": "primary",
+          "data_terms_reviewed": true
+        },
+        {
+          "name": "Google DeepMind",
+          "tier": "secondary",
+          "data_terms_reviewed": true
+        },
+        {
+          "name": "Azure OpenAI Service",
+          "tier": "secondary",
+          "data_terms_reviewed": true
+        }
+      ],
+      "new_provider_rule": {
+        "action": "block",
+        "approver": "CFO"
+      }
+    },
+    "routing": {
+      "default_tier": "efficient",
+      "frontier_exception": {
+        "self_serve": false,
+        "window_hours": 24,
+        "approver": "CFO",
+        "max_delta_usd": 100
+      }
+    },
+    "budgets": {
+      "company_envelope_usd_month": 17000,
+      "team_envelopes": [
+        {
+          "team": "Engineering",
+          "usd_month": 6500,
+          "variance_band_pct": 20,
+          "unit_cost_metric": "cost per merged PR"
+        },
+        {
+          "team": "ML Platform",
+          "usd_month": 4500,
+          "variance_band_pct": 20,
+          "unit_cost_metric": "cost per model deployment"
+        },
+        {
+          "team": "Data",
+          "usd_month": 2500,
+          "variance_band_pct": 18,
+          "unit_cost_metric": "cost per pipeline run"
+        },
+        {
+          "team": "Operations",
+          "usd_month": 1800,
+          "variance_band_pct": 15,
+          "unit_cost_metric": "cost per resolved support ticket"
+        },
+        {
+          "team": "GTM",
+          "usd_month": 900,
+          "variance_band_pct": 15,
+          "unit_cost_metric": "cost per qualified lead"
+        }
+      ],
+      "burn_alert_pct": 72,
+      "benchmark": {
+        "sector_median_per_employee_usd": 7.69,
+        "envelope_multiple_of_median": 1.8,
+        "source": "Ramp AI Index, ramp.com/data, May 2026"
+      }
+    },
+    "agents": {
+      "max_retries_per_task": 10,
+      "max_context_growth_pct_per_loop": 15,
+      "kill_threshold_usd_per_hour": 20,
+      "agent_card": {
+        "enabled": true,
+        "single_txn_ceiling_usd": 250,
+        "merchant_scopes": [
+          "licensed-data-providers",
+          "approved-inference-apis",
+          "research-databases"
+        ]
+      }
+    },
+    "shadow_ai": {
+      "employee_card_ai_merchants": "reroute",
+      "team_subscription_threshold": 1,
+      "reimbursement_rule": "AI tool purchases on personal or employee cards are not reimbursable; all AI subscriptions must be procured through the approved vendor catalog via Finance."
+    },
+    "classification": {
+      "default_class": "OpEx",
+      "rules": [
+        {
+          "match": "project_tag",
+          "value": "customer-facing-product",
+          "class": "COGS"
+        },
+        {
+          "match": "environment",
+          "value": "production",
+          "class": "COGS"
+        },
+        {
+          "match": "project_tag",
+          "value": "internal-tool",
+          "class": "OpEx"
+        }
+      ]
+    },
+    "approvals": {
+      "fine_tune_over_usd": 1000,
+      "contract_over_usd": 5000,
+      "new_provider_approver": "CFO",
+      "frontier_exception_approver": "CFO"
+    },
+    "response_ladder": [
+      {
+        "step": 1,
+        "trigger": "Team envelope reaches 72% of monthly budget before day 20",
+        "action": "alert",
+        "window_hours": 4,
+        "owner": "Team lead"
+      },
+      {
+        "step": 2,
+        "trigger": "Team envelope reaches 90% of monthly budget or spend rate projects overage within 5 days",
+        "action": "throttle",
+        "window_hours": 2,
+        "owner": "Engineering lead"
+      },
+      {
+        "step": 3,
+        "trigger": "Company envelope reaches 95% of monthly budget or any team exceeds envelope by more than 10%",
+        "action": "block",
+        "window_hours": 1,
+        "owner": "CFO"
+      }
+    ],
+    "rationales": {
+      "e1": "Production inference for the support-triage service at $211/day ($6,330/month) falls within the Engineering envelope of $6,500 and is correctly routed to an allowlisted primary provider under the efficient default tier.",
+      "e2": "Nightly embeddings job at $38/day ($1,140/month) is attributed to the Data team, within the $2,500 Data envelope, and qualifies as a routine batch workload requiring no escalation.",
+      "e3": "A 96% cost-per-request increase with flat volume indicates a model version or prompt-size regression in the deploy; this breaches the 20% variance band on the Engineering envelope and triggers a step-1 alert to the team lead for root-cause review within 4 hours.",
+      "e4": "This is the third ChatGPT Team subscription on the Marketing card this quarter, exceeding the team_subscription_threshold of 1 duplicate; the charge is rerouted to the approved vendor catalog and the employee card transaction is blocked per shadow AI policy.",
+      "e5": "The $4,800 fine-tune request from ML Platform exceeds the $1,000 approval threshold; it is routed for CFO sign-off before the job is queued, and the standard ML procurement checklist must be completed.",
+      "e6": "The autonomous research agent reached 340 retries per hour, exceeding the 10-retry-per-task limit, and context grew each cycle beyond the 15% per-loop cap; the agent was killed before it reached the $20/hr kill threshold, preventing an estimated $1,090 in uncontrolled burn.",
+      "e7": "The Growth team frontier-model exception for the demo build is within the 24-hour approval window and the $100 delta cap; the request is forwarded to the CFO for same-day approval before any frontier spend is incurred.",
+      "e8": "A 22x baseline spike on an unattributed personal API key triggers ladder step 2 throttle; the Engineering lead is notified within 2 hours to attribute the project tag and confirm the work is sanctioned before spend resumes.",
+      "e9": "Agent card charge of 499 against a 250 ceiling. Approval required.",
+      "e10": "The Design team's $89/month AI video trial duplicates a $1,400/year Sales contract at 40% seat utilization; consolidating onto the existing contract recovers $840 in annualized unused seat value and the trial subscription is rerouted to that contract.",
+      "e11": "Unrecognized provider under a block new-provider rule. Blocked, owner paged.",
+      "e12": "Inference tagged to an internal tool is reclassified from COGS to OpEx per the project_tag rule matching 'internal-tool'; the corrected classification is applied retroactively to the current month's ledger.",
+      "e13": "Month-to-date spend at 87% of the company envelope with 9 days remaining exceeds the 72% burn_alert_pct trigger; the CFO and Engineering lead are notified and non-critical workloads are throttled to prevent envelope breach before month close.",
+      "e14": "Weekly rollup is complete; all team envelopes, classification rules, and agent guardrails are within policy parameters and no open exceptions remain pending beyond the active CFO approval queue."
+    }
+  }
+}

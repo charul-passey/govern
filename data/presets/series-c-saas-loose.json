@@ -1,0 +1,179 @@
+{
+  "profile": {
+    "company_name": "Series C SaaS",
+    "headcount_band": "101-500",
+    "sector": "software",
+    "ai_maturity": "scaling",
+    "strictness": "loose"
+  },
+  "policy": {
+    "meta": {
+      "company_name": "Series C SaaS",
+      "strictness": "loose",
+      "summary": "AI spend envelopes set at 2.0x sector median, with frontier exceptions self-serve up to 168 hours and agent kill threshold at $80 per hour."
+    },
+    "providers": {
+      "allowlist": [
+        {
+          "name": "Anthropic",
+          "tier": "primary",
+          "data_terms_reviewed": true
+        },
+        {
+          "name": "OpenAI",
+          "tier": "primary",
+          "data_terms_reviewed": true
+        },
+        {
+          "name": "Google DeepMind",
+          "tier": "secondary",
+          "data_terms_reviewed": true
+        },
+        {
+          "name": "Mistral",
+          "tier": "secondary",
+          "data_terms_reviewed": false
+        }
+      ],
+      "new_provider_rule": {
+        "action": "allow_with_review",
+        "approver": "Engineering lead"
+      }
+    },
+    "routing": {
+      "default_tier": "efficient",
+      "frontier_exception": {
+        "self_serve": true,
+        "window_hours": 168,
+        "approver": "Engineering lead",
+        "max_delta_usd": 1000
+      }
+    },
+    "budgets": {
+      "company_envelope_usd_month": 40000,
+      "team_envelopes": [
+        {
+          "team": "Engineering",
+          "usd_month": 18000,
+          "variance_band_pct": 60,
+          "unit_cost_metric": "cost per merged PR"
+        },
+        {
+          "team": "Data",
+          "usd_month": 8000,
+          "variance_band_pct": 55,
+          "unit_cost_metric": "cost per pipeline run"
+        },
+        {
+          "team": "Product",
+          "usd_month": 5000,
+          "variance_band_pct": 60,
+          "unit_cost_metric": "cost per shipped spec"
+        },
+        {
+          "team": "GTM",
+          "usd_month": 3500,
+          "variance_band_pct": 50,
+          "unit_cost_metric": "cost per qualified lead"
+        },
+        {
+          "team": "Support",
+          "usd_month": 2500,
+          "variance_band_pct": 55,
+          "unit_cost_metric": "cost per resolved ticket"
+        }
+      ],
+      "burn_alert_pct": 90,
+      "benchmark": {
+        "sector_median_per_employee_usd": 66.29,
+        "envelope_multiple_of_median": 2,
+        "source": "Ramp AI Index, ramp.com/data, May 2026"
+      }
+    },
+    "agents": {
+      "max_retries_per_task": 50,
+      "max_context_growth_pct_per_loop": 65,
+      "kill_threshold_usd_per_hour": 80,
+      "agent_card": {
+        "enabled": true,
+        "single_txn_ceiling_usd": 750,
+        "merchant_scopes": [
+          "inference-api",
+          "dataset-license",
+          "model-registry",
+          "developer-tooling"
+        ]
+      }
+    },
+    "shadow_ai": {
+      "employee_card_ai_merchants": "flag",
+      "team_subscription_threshold": 5,
+      "reimbursement_rule": "AI tool purchases on personal or employee cards are reimbursable up to $50 per month per employee only when submitted with a project tag within 30 days of purchase; amounts above $50 or without a project tag are not reimbursable."
+    },
+    "classification": {
+      "default_class": "OpEx",
+      "rules": [
+        {
+          "match": "environment",
+          "value": "production",
+          "class": "COGS"
+        },
+        {
+          "match": "project_tag",
+          "value": "customer-facing",
+          "class": "COGS"
+        },
+        {
+          "match": "project_tag",
+          "value": "internal-tool",
+          "class": "OpEx"
+        }
+      ]
+    },
+    "approvals": {
+      "fine_tune_over_usd": 15000,
+      "contract_over_usd": 25000,
+      "new_provider_approver": "Engineering lead",
+      "frontier_exception_approver": "Engineering lead"
+    },
+    "response_ladder": [
+      {
+        "step": 1,
+        "trigger": "Team envelope reaches 90% of monthly allocation",
+        "action": "alert",
+        "window_hours": 24,
+        "owner": "Team lead"
+      },
+      {
+        "step": 2,
+        "trigger": "Team envelope reaches 110% of monthly allocation or unattributed spend exceeds $500 in 24 hours",
+        "action": "throttle",
+        "window_hours": 48,
+        "owner": "Engineering lead"
+      },
+      {
+        "step": 3,
+        "trigger": "Company envelope reaches 100% of monthly allocation before month end",
+        "action": "block",
+        "window_hours": 72,
+        "owner": "Controller"
+      }
+    ],
+    "rationales": {
+      "e1": "Production inference for the support-triage service at $211 daily run rate is admitted under the Anthropic primary allowlist and classified COGS per the production environment rule.",
+      "e2": "Nightly embeddings job at $38 is admitted under the Anthropic primary allowlist and classified OpEx as a Data team internal pipeline with no customer-facing tag.",
+      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 60% variance band; the likely cause is a model version upgrade or prompt expansion introduced in the deploy.",
+      "e4": "Marketing team has three ChatGPT Team subscriptions this quarter, which is below the five-subscription shadow-AI threshold, so the charge is flagged for visibility but not rerouted.",
+      "e5": "Fine-tune estimate 4800 against the 15000 approval line. Approved.",
+      "e6": "340 retries at 47 per hour, over the 50 retry limit. About 1090 in overnight burn prevented. Blocked, owner paged.",
+      "e7": "Growth team frontier-model exception for the demo build is self-serve approved under the 168-hour window; the incremental cost delta must remain within the $1,000 cap.",
+      "e8": "Junior engineer personal API key at 22x baseline with no project tag triggers ladder step 2 throttle; experimentation carve-out is preserved pending tag attribution within 48 hours.",
+      "e9": "Procurement agent $499 dataset license purchase is within the $750 single-transaction agent card ceiling and falls under the dataset-license merchant scope, so it is approved.",
+      "e10": "Design team $89 per month AI video trial overlaps with Sales team's $1,400 per year contract at 40% seat utilization; consolidating to the existing contract recovers $840 in annualized unused seat value.",
+      "e11": "Unrecognized provider under a allow_with_review new-provider rule. Approved.",
+      "e12": "Inference tagged to an internal tool was misclassified as COGS; the internal-tool project tag rule overrides the production environment default and reclassifies the spend as OpEx.",
+      "e13": "Company spend at 87% of envelope against a 90% burn alert, 9 days left. Approved.",
+      "e14": "Weekly rollup. Week closed."
+    }
+  }
+}
