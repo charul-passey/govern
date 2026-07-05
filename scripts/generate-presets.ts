@@ -12,6 +12,7 @@ import path from "node:path";
 import { policySchema } from "@/lib/policy-schema";
 import { profileSchema, type CompanyProfile } from "@/lib/profile";
 import { generateWithClaude } from "@/lib/generate-policy";
+import { validateRationales } from "@/lib/validate-rationales";
 import { evaluate } from "@/lib/engine";
 import { events } from "@/data/events";
 
@@ -37,7 +38,11 @@ async function main(): Promise<void> {
   for (const base of BASE_PROFILES) {
     for (const strictness of STRICTNESS) {
       const profile = profileSchema.parse({ ...base, strictness });
-      const policy = await generateWithClaude(profile);
+      const raw = await generateWithClaude(profile);
+
+      // Same validation as the route: replace any rationale the engine disagrees
+      // with, so presets are written with validated rationales only.
+      const { policy, report } = validateRationales(raw);
       policySchema.parse(policy);
 
       // Engine check: every event evaluates and the runaway agent always blocks.
@@ -49,7 +54,10 @@ async function main(): Promise<void> {
 
       const file = path.join(OUT_DIR, `${slug(base.company_name)}-${strictness}.json`);
       fs.writeFileSync(file, `${JSON.stringify({ profile, policy }, null, 2)}\n`);
-      console.log(`wrote ${path.relative(process.cwd(), file)}`);
+      const note = report.length
+        ? `, ${report.length} rationale(s) replaced: ${report.map((r) => `${r.eventId} ${r.reason}`).join(", ")}`
+        : "";
+      console.log(`wrote ${path.relative(process.cwd(), file)}${note}`);
     }
   }
 }

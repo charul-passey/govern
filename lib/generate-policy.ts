@@ -7,6 +7,7 @@ import { type CompanyProfile } from "@/lib/profile";
 import { events } from "@/data/events";
 import { nearestPreset } from "@/lib/presets";
 import { FLOOR_POLICY } from "@/lib/fallback-policy";
+import { validateRationales, type RationaleReplacement } from "@/lib/validate-rationales";
 
 const MODEL = "claude-sonnet-4-6";
 const TEMPERATURE = 0.3;
@@ -82,6 +83,7 @@ export interface GenerateResult {
   source: "generated" | "preset" | "floor";
   fallback: boolean;
   reason?: string;
+  report?: RationaleReplacement[];
 }
 
 function cached(profile: CompanyProfile, reason: string): GenerateResult {
@@ -98,8 +100,10 @@ export async function resolvePolicy(
 ): Promise<GenerateResult> {
   if (process.env.ANTHROPIC_API_KEY) {
     try {
-      const policy = await generateWithClaude(profile);
-      return { policy, source: "generated", fallback: false };
+      const raw = await generateWithClaude(profile);
+      // The engine, not the model, is the source of truth for rationales.
+      const { policy, report } = validateRationales(raw);
+      return { policy, source: "generated", fallback: false, report };
     } catch {
       return cached(profile, "generation_failed");
     }

@@ -1,6 +1,7 @@
 import type { Policy } from "@/lib/policy-schema";
 import { events } from "@/data/events";
-import { templateRationale } from "@/lib/rationales";
+import { evaluate } from "@/lib/engine";
+import { templateFromResult } from "@/lib/rationales";
 
 // The never-fails floor beneath the two-tier fallback. Hand-written, schema-valid,
 // and covered by lib/fallback-policy.test.ts. This is deliberately NOT a generated
@@ -80,8 +81,12 @@ const core: Omit<Policy, "rationales"> = {
   ],
 };
 
+const withPlaceholder: Policy = { ...core, rationales: {} as Policy["rationales"] };
 const rationales = Object.fromEntries(
-  events.map((e) => [e.id, templateRationale(core, e)]),
+  events.map((e) => [
+    e.id,
+    templateFromResult(withPlaceholder, e, evaluate(withPlaceholder, e)),
+  ]),
 ) as Policy["rationales"];
 
 export const FLOOR_POLICY: Policy = { ...core, rationales };

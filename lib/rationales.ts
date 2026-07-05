@@ -1,40 +1,68 @@
 import type { Policy } from "@/lib/policy-schema";
-import type { Event } from "@/data/events";
+import type { Event, Verdict } from "@/data/events";
+import type { EvalResult } from "@/lib/engine";
 
-// Deterministic rationale templates: one plain sentence per event, written as the
-// engine explaining its verdict against concrete policy numbers. Used to fill the
-// floor policy, and available as the fallback when a generated rationale is
-// missing. No dashes, plain language.
-export function templateRationale(
-  policy: Omit<Policy, "rationales">,
-  event: Event,
-): string {
+const VERDICT_LEDE: Record<Verdict, string> = {
+  approved: "Approved.",
+  approval_recommended: "Approval recommended.",
+  approval_required: "Approval required.",
+  flagged_variance: "Flagged as a variance breach.",
+  flagged_consolidation: "Flagged for consolidation.",
+  rerouted_shadow: "Rerouted to the central contract.",
+  throttled: "Throttled per the response ladder.",
+  alert_burn: "Burn pacing alert. No action required.",
+  blocked: "Blocked, owner paged.",
+  week_closed: "Week closed.",
+};
+
+// The factual half of a rationale: the event's numbers against the policy values,
+// naming only the clauses that actually fired.
+function detail(policy: Policy, event: Event, result: EvalResult): string {
   switch (event.type) {
     case "api_usage":
-      return `${event.team} usage runs on an allowlisted provider and sits inside its monthly envelope. Approved.`;
+      return `${event.team} usage on an allowlisted provider, inside its monthly envelope.`;
     case "variance":
-      return `Cost per request moved ${event.variancePct}% against the team variance band. Alerted at ladder step 1, not blocked.`;
+      return `Cost per request moved ${event.variancePct}% against the variance band.`;
     case "employee_card":
-      return `Subscription ${event.teamSubscriptionCount} for ${event.team} passed the ${policy.shadow_ai.team_subscription_threshold} threshold. Rerouted to the central contract.`;
+      return `Subscription ${event.teamSubscriptionCount} for ${event.team} against a ${policy.shadow_ai.team_subscription_threshold} subscription threshold.`;
     case "fine_tune":
-      return `Estimated ${event.estimatedUsd} clears the ${policy.approvals.fine_tune_over_usd} fine-tune line. Recommended for approval with checks passed.`;
-    case "agent_loop":
-      return `${event.retries} retries at ${event.usdPerHour} per hour breached the ${policy.agents.max_retries_per_task} retry limit. Agent blocked and owner paged.`;
+      return `Fine-tune estimate ${event.estimatedUsd} against the ${policy.approvals.fine_tune_over_usd} approval line.`;
+    case "agent_loop": {
+      const parts = [`${event.retries} retries at ${event.usdPerHour} per hour`];
+      if (result.firedClauses.includes("agents.max_retries_per_task")) {
+        parts.push(`over the ${policy.agents.max_retries_per_task} retry limit`);
+      }
+      if (result.firedClauses.includes("agents.kill_threshold_usd_per_hour")) {
+        parts.push(`over the ${policy.agents.kill_threshold_usd_per_hour} per-hour kill threshold`);
+      }
+      return `${parts.join(", ")}.`;
+    }
     case "routing_exception":
-      return `Frontier delta of ${event.deltaUsd} sits within the ${policy.routing.frontier_exception.max_delta_usd} cap. Approved for the exception window.`;
+      return `Frontier delta of ${event.deltaUsd} against a ${policy.routing.frontier_exception.max_delta_usd} cap.`;
     case "usage_spike":
-      return `Usage reached ${event.baselineMultiple}x baseline with no project tag. Throttled at ladder step 2, experimentation carve-out preserved.`;
+      return `Usage at ${event.baselineMultiple}x baseline with no project tag.`;
     case "agent_card":
-      return `Agent card charge of ${event.amountUsd} is within scope and under the ${policy.agents.agent_card.single_txn_ceiling_usd} ceiling. Approved.`;
+      return `Agent card charge of ${event.amountUsd} against a ${policy.agents.agent_card.single_txn_ceiling_usd} ceiling.`;
     case "subscription":
-      return `Overlapping tool found. Merging saves about ${event.projectedSavingsUsdYear} per year. Flagged for consolidation.`;
+      return `Overlapping tool, about ${event.projectedSavingsUsdYear} per year saved if merged.`;
     case "new_provider":
-      return `First charge from an unrecognized provider. The new-provider rule is set to ${policy.providers.new_provider_rule.action}. Approval required.`;
+      return `Unrecognized provider under a ${policy.providers.new_provider_rule.action} new-provider rule.`;
     case "classification":
-      return `Charge reclassified to ${policy.classification.default_class} under the tag rules. Approved and noted for the controller.`;
+      return `Charge reclassified to ${policy.classification.default_class} under the tag rules.`;
     case "burn_pacing":
-      return `Company spend at ${event.envelopePct}% of envelope against the ${policy.budgets.burn_alert_pct}% alert, ${event.daysRemaining} days left. Pacing alert only.`;
+      return `Company spend at ${event.envelopePct}% of envelope against a ${policy.budgets.burn_alert_pct}% burn alert, ${event.daysRemaining} days left.`;
     case "week_close":
-      return "Week closed. Every verdict above traces to a clause in the policy.";
+      return "Weekly rollup.";
   }
+}
+
+// Deterministic rationale built from the engine result and policy values: what the
+// numbers were, then what the engine did. Only fired clauses are named, so it is
+// always consistent with the verdict.
+export function templateFromResult(
+  policy: Policy,
+  event: Event,
+  result: EvalResult,
+): string {
+  return `${detail(policy, event, result)} ${VERDICT_LEDE[result.verdict]}`;
 }
