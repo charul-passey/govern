@@ -1,0 +1,63 @@
+// data/ai-index.ts
+// Generated from the Ramp AI Index public dataset (ramp.com/data), May 2026 release.
+// Source of truth is the downloaded CSV bundle. Never edit values by hand; regenerate.
+// Cite as: Ramp AI Index, ramp.com/data, May 2026.
+
+export const AI_INDEX_HEADLINE: { month: string; ramp: number | null; census: number | null }[] = [
+  { month: '2023-01', ramp: 7.46, census: null },
+  { month: '2023-02', ramp: 12.06, census: null },
+  { month: '2023-03', ramp: 20.91, census: null },
+  { month: '2023-04', ramp: 24.4, census: null },
+  { month: '2023-05', ramp: 26.1, census: null },
+  { month: '2023-06', ramp: 25.66, census: null },
+  { month: '2023-07', ramp: 27.14, census: null },
+  { month: '2023-08', ramp: 27.89, census: null },
+  { month: '2023-09', ramp: 29.03, census: 3.7 },
+  { month: '2023-10', ramp: 29.65, census: 3.85 },
+  { month: '2023-11', ramp: 30.47, census: 4.5 },
+  { month: '2023-12', ramp: 31.68, census: 4.9 },
+  { month: '2024-01', ramp: 32.52, census: 4.97 },
+  { month: '2024-02', ramp: 32.73, census: 4.85 },
+  { month: '2024-03', ramp: 33.35, census: 4.3 },
+  { month: '2024-04', ramp: 33.12, census: 4.75 },
+  { month: '2024-05', ramp: 33.22, census: 4.7 },
+  { month: '2024-06', ramp: 33.47, census: 4.85 },
+  { month: '2024-07', ramp: 33.88, census: 5.07 },
+  { month: '2024-08', ramp: 34.21, census: 5.6 },
+  { month: '2024-09', ramp: 35.21, census: 5.95 },
+  { month: '2024-10', ramp: 35.83, census: 6.0 },
+  { month: '2024-11', ramp: 36.36, census: 6.1 },
+  { month: '2024-12', ramp: 36.65, census: 6.13 },
+  { month: '2025-01', ramp: 37.73, census: 6.75 },
+  { month: '2025-02', ramp: 38.67, census: 7.35 },
+  { month: '2025-03', ramp: 39.17, census: 7.9 },
+  { month: '2025-04', ramp: 40.77, census: 8.5 },
+  { month: '2025-05', ramp: 41.91, census: 8.95 },
+  { month: '2025-06', ramp: 42.72, census: 9.27 },
+  { month: '2025-07', ramp: 44.08, census: 9.1 },
+  { month: '2025-08', ramp: 44.98, census: 9.4 },
+  { month: '2025-09', ramp: 45.19, census: 9.95 },
+  { month: '2025-10', ramp: 45.1, census: null },
+  { month: '2025-11', ramp: 45.94, census: 17.3 },
+  { month: '2025-12', ramp: 45.91, census: 17.57 },
+  { month: '2026-01', ramp: 46.96, census: 18.55 },
+  { month: '2026-02', ramp: 49.1, census: 17.85 },
+  { month: '2026-03', ramp: 51.26, census: 19.0 },
+  { month: '2026-04', ramp: 52.97, census: 19.8 },
+  { month: '2026-05', ramp: 54.18, census: 20.05 },
+];
+
+export const BENCHMARKS_MAY_2026 = {
+  spendPerEmployeeUsdMonth: { median: 11.38, top10Median: 610.61, top1Median: 7448.85 },
+  bySize: { Small: 21.33, Medium: 7.94, Large: 2.30 },
+  bySector: { 'Technology and media': 66.29, 'Finance and insurance': 36.36, 'Professional, scientific, and technical services': 26.83, Retail: 8.00, Manufacturing: 7.69, Construction: 4.15, 'Health care': 2.86, 'Accommodation and food services': 1.78 },
+  byFinancing: { 'VC-backed': 69.67, 'PE-backed': 7.60, Other: 7.27 },
+  adoptionBySector: { 'Technology and media': 79.03, 'Finance and insurance': 73.05, Manufacturing: 58.0, Retail: 47.0, 'Health care': 41.22, Construction: 39.87, 'Accommodation and food services': 30.95 },
+  adoptionBySize: { Large: 64.69, Medium: 60.27, Small: 47.96 },
+  providerAdoption: { Anthropic: 41.02, OpenAI: 39.54, Google: 6.11, xAI: 3.12, DeepSeek: 0.30 },
+  spendMixBySize: {
+    Large:  { api: 53.3, chatSubs: 2.4, codingAgentSubs: 3.9, other: 40.3 },
+    Medium: { api: 34.2, chatSubs: 4.3, codingAgentSubs: 3.9, other: 57.6 },
+    Small:  { api: 45.0, chatSubs: 9.6, codingAgentSubs: 7.3, other: 38.1 },
+  },
+} as const;

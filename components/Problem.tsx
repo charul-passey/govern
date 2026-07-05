@@ -1,87 +1,133 @@
+import { AdoptionChart } from "@/components/AdoptionChart";
+
+// Citation mark. Rendered at caption text size and raised, so it reads as a
+// citation, not an exponent (per content/site-copy.md).
+function Cite({ n }: { n: number }) {
+  return <sup className="ml-0.5 text-sm font-medium text-ink/50">{n}</sup>;
+}
+
+function StatCard({
+  value,
+  caption,
+  note,
+  highlight = false,
+}: {
+  value: string;
+  caption: string;
+  note: number;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={
+        highlight
+          ? "rounded-md bg-accent p-5"
+          : "rounded-md border border-ink/10 bg-ground p-5"
+      }
+    >
+      <div className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
+        {value}
+      </div>
+      <p className={highlight ? "mt-2 text-sm text-ink/70" : "mt-2 text-sm text-ink/60"}>
+        {caption}
+        <Cite n={note} />
+      </p>
+    </div>
+  );
+}
+
 export function Problem() {
   return (
     <section id="problem" className="bg-ground px-6 py-20 sm:py-24">
       <div className="mx-auto max-w-shell">
         <h2 className="sr-only">The problem</h2>
 
-        {/* Data wall: four cited stat cards. 13x carries the single yellow highlight. */}
+        {/* Data wall. 13x carries the single yellow highlight. Copy verbatim from
+            content/site-copy.md. */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="rounded-md bg-accent p-5">
-            <div className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              13×<sup className="ml-0.5 font-semibold text-ink/70">1</sup>
-            </div>
-            <p className="mt-2 text-sm text-ink/70">
-              growth in average monthly AI token spend since Jan 2025
-            </p>
-          </div>
-
-          <div className="rounded-md border border-ink/10 bg-ground p-5">
-            <div className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              50.4%<sup className="ml-0.5 font-semibold text-ink/50">2</sup>
-            </div>
-            <p className="mt-2 text-sm text-ink/60">
-              share of U.S. businesses paying for AI
-            </p>
-          </div>
-
-          <div className="rounded-md border border-ink/10 bg-ground p-5">
-            <div className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              3×<sup className="ml-0.5 font-semibold text-ink/50">3</sup>
-            </div>
-            <p className="mt-2 text-sm text-ink/60">
-              YoY growth in AI-related reimbursements = shadow AI on personal cards
-            </p>
-          </div>
-
-          <div className="rounded-md border border-ink/10 bg-ground p-5">
-            <div className="text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
-              4–15×<sup className="ml-0.5 font-semibold text-ink/50">4</sup>
-            </div>
-            <p className="mt-2 text-sm text-ink/60">
-              top-quartile vs median AI spend variance by vendor
-            </p>
-          </div>
+          <StatCard
+            value="13×"
+            caption="growth in average monthly AI token spend since January 2025"
+            note={1}
+            highlight
+          />
+          <StatCard
+            value="54.2%"
+            caption="share of U.S. businesses now paying for AI services"
+            note={2}
+          />
+          <StatCard
+            value="3×"
+            caption="year-over-year growth in AI charges surfacing as employee reimbursements"
+            note={3}
+          />
+          <StatCard
+            value="54×"
+            caption="gap between the median company and the top decile in monthly AI spend per employee"
+            note={3}
+          />
         </div>
 
-        {/* Argument, rendered as the spec wrote it. Em dash converted to a period;
-            the visibility citation moved to footnote 5 to keep the body company-neutral. */}
-        <div className="mt-12 max-w-prose space-y-4">
-          <p className="text-lg leading-relaxed text-ink/80">
-            Seat-based budgeting assumes humans initiate spend at human speed;
-            token billing is machine-initiated, volatile, and invisible to every
-            control built for the first two pillars (people, vendors).
+        <AdoptionChart />
+
+        {/* Body, five paragraphs, verbatim. Apostrophes rendered typographically. */}
+        <div className="mt-12 max-w-prose space-y-4 text-lg leading-relaxed text-ink/80">
+          <p>
+            Every system a company uses to control spending makes the same three
+            assumptions: a human decides to spend, at human speed, at a price
+            agreed in advance. Payroll works this way. Vendor contracts work this
+            way. The corporate card works this way, too. Swipe, policy check,
+            approval.
           </p>
-          <p className="text-lg leading-relaxed text-ink/80">
-            The state of the art for control today is a flat per-employee cap. A
-            seat-era instrument aimed at a usage-era problem.
+          <p>
+            Token billing breaks all three assumptions at once. Spend is initiated
+            by software, at machine speed, at prices that float with usage. A
+            prompt-template change can triple a bill overnight. An agent stuck in a
+            retry loop can burn a quarter’s budget before Monday standup. And on
+            the invoice, a junior engineer’s Friday-night experiment looks
+            identical to production inference.
           </p>
-          <p className="text-lg leading-relaxed text-ink/80">
-            Visibility products solved <em>seeing</em>.
-            <sup className="ml-0.5 font-semibold text-ink/50">5</sup>
+          <p>
+            Finance teams know it. AI charges are leaking onto personal cards and
+            coming back as reimbursements, up 3× in a year.
+            <Cite n={3} /> The most sophisticated control publicly deployed at
+            scale is a flat monthly cap per employee.
+            <Cite n={4} /> That is a seat-era instrument aimed at a usage-era
+            problem. A cap rations spend, punishes the teams whose AI use is
+            actually working, and governs nothing.
           </p>
-          <p className="text-xl font-semibold text-ink">
-            Nobody has solved <em>governing</em>.
+          <p>
+            The market’s answer so far is visibility: dashboards that show where
+            the tokens went. Visibility is necessary. It is also where every
+            product on the market stops. A dashboard reports the fire. Policy
+            decides which fires can’t start. For people and for vendors, that
+            policy layer took decades to build. For intelligence, it doesn’t exist
+            yet.
+          </p>
+          <p className="text-ink">
+            What would it look like if it did?{" "}
+            <a
+              href="#demo"
+              className="rounded-sm font-semibold text-ink underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ground"
+            >
+              Generate one and find out. ↓
+            </a>
           </p>
         </div>
-
-        {/* Closing line links into the demo. New copy, not from the spec. */}
-        <p className="mt-10 max-w-prose">
-          <a
-            href="#demo"
-            className="rounded-sm text-base font-semibold text-ink underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ground"
-          >
-            Generate one and find out ↓
-          </a>
-        </p>
 
         {/* Citations. The only sanctioned place the word Ramp may appear in UI. */}
         <div className="mt-12 border-t border-ink/10 pt-6">
           <ol className="max-w-prose list-decimal space-y-1 pl-5 text-xs text-ink/50 marker:text-ink/40">
-            <li>Ramp Economics Lab, Spring 2026 report.</li>
-            <li>Ramp AI Index, Mar 2026.</li>
-            <li>Ramp, “How to buy AI.”</li>
-            <li>Ramp, “How to buy AI.” Same report as note 3.</li>
-            <li>Includes Ramp’s own AI visibility launch, April 2026.</li>
+            <li>Ramp Economics Lab, Business Spending Report, Spring 2026.</li>
+            <li>Ramp AI Index, ramp.com/data, May 2026.</li>
+            <li>
+              Ramp AI Index dataset, May 2026: median monthly AI spend per
+              employee $11.38; top-decile median $610.61.
+            </li>
+            <li>
+              Reported enterprise per-employee AI budget cap. TechCrunch, June
+              2026.
+            </li>
           </ol>
         </div>
       </div>
