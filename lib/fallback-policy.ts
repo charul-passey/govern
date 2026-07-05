@@ -12,7 +12,7 @@ const core: Omit<Policy, "rationales"> = {
   meta: {
     company_name: "Series C SaaS",
     strictness: "normal",
-    summary: "Envelopes set at 2.0x sector median.",
+    summary: "Envelopes set at 4.5x sector median.",
   },
   providers: {
     allowlist: [
@@ -42,7 +42,7 @@ const core: Omit<Policy, "rationales"> = {
     burn_alert_pct: 85,
     benchmark: {
       sector_median_per_employee_usd: 66.29,
-      envelope_multiple_of_median: 2.0,
+      envelope_multiple_of_median: 4.5,
       source: "Ramp AI Index, ramp.com/data, May 2026",
     },
   },

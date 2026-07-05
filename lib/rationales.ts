@@ -35,7 +35,11 @@ function detail(policy: Policy, event: Event, result: EvalResult): string {
       if (result.firedClauses.includes("agents.kill_threshold_usd_per_hour")) {
         parts.push(`over the ${policy.agents.kill_threshold_usd_per_hour} per-hour kill threshold`);
       }
-      return `${parts.join(", ")}.`;
+      const burn =
+        event.projectedOvernightUsd != null
+          ? ` About ${event.projectedOvernightUsd} in overnight burn prevented.`
+          : "";
+      return `${parts.join(", ")}.${burn}`;
     }
     case "routing_exception":
       return `Frontier delta of ${event.deltaUsd} against a ${policy.routing.frontier_exception.max_delta_usd} cap.`;

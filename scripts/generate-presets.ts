@@ -12,7 +12,7 @@ import path from "node:path";
 import { policySchema } from "@/lib/policy-schema";
 import { profileSchema, type CompanyProfile } from "@/lib/profile";
 import { generateWithClaude } from "@/lib/generate-policy";
-import { validateRationales } from "@/lib/validate-rationales";
+import { validateGeneration } from "@/lib/validate-generation";
 import { evaluate } from "@/lib/engine";
 import { events } from "@/data/events";
 
@@ -35,31 +35,39 @@ async function main(): Promise<void> {
   }
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
+  let failures = 0;
   for (const base of BASE_PROFILES) {
     for (const strictness of STRICTNESS) {
       const profile = profileSchema.parse({ ...base, strictness });
-      const raw = await generateWithClaude(profile);
+      const label = `${base.company_name} ${strictness}`;
+      try {
+        // Conformance is enforced inside generateWithClaude (retry then throw).
+        const raw = await generateWithClaude(profile);
 
-      // Same validation as the route: replace any rationale the engine disagrees
-      // with, so presets are written with validated rationales only.
-      const { policy, report } = validateRationales(raw);
-      policySchema.parse(policy);
+        // Same three deterministic checks as the route, so presets are written
+        // with reconciled benchmarks and validated rationales only.
+        const { policy, report } = validateGeneration(raw, profile);
+        policySchema.parse(policy);
 
-      // Engine check: every event evaluates and the runaway agent always blocks.
-      for (const event of events) evaluate(policy, event);
-      const e6 = events.find((e) => e.id === "e6");
-      if (!e6 || evaluate(policy, e6).verdict !== "blocked") {
-        throw new Error(`e6 not blocked for ${profile.company_name} ${strictness}`);
+        for (const event of events) evaluate(policy, event);
+        const e6 = events.find((e) => e.id === "e6");
+        if (!e6 || evaluate(policy, e6).verdict !== "blocked") {
+          throw new Error("e6 not blocked");
+        }
+
+        const file = path.join(OUT_DIR, `${slug(base.company_name)}-${strictness}.json`);
+        fs.writeFileSync(file, `${JSON.stringify({ profile, policy }, null, 2)}\n`);
+        const note = report.length
+          ? `: ${report.map((r) => (r.check === "rationale" ? `${r.eventId}/${r.reason}` : r.check === "canonical" ? `${r.eventId}/canonical` : `benchmark ${r.statedMultiple}->${r.computedMultiple}`)).join(", ")}`
+          : ": no changes";
+        console.log(`OK   ${label} -> ${path.relative(process.cwd(), file)} (${report.length} fix(es)${note})`);
+      } catch (err) {
+        failures += 1;
+        console.error(`FAIL ${label}: ${err instanceof Error ? err.message : String(err)}`);
       }
-
-      const file = path.join(OUT_DIR, `${slug(base.company_name)}-${strictness}.json`);
-      fs.writeFileSync(file, `${JSON.stringify({ profile, policy }, null, 2)}\n`);
-      const note = report.length
-        ? `, ${report.length} rationale(s) replaced: ${report.map((r) => `${r.eventId} ${r.reason}`).join(", ")}`
-        : "";
-      console.log(`wrote ${path.relative(process.cwd(), file)}${note}`);
     }
   }
+  if (failures > 0) throw new Error(`${failures} preset(s) failed to generate`);
 }
 
 main().catch((err) => {
