@@ -6,6 +6,7 @@
   html {
     color: theme("colors.ink");
     background-color: theme("colors.ground");
+    scroll-behavior: smooth;
   }
 }
 
