@@ -27,7 +27,8 @@ instruction conflict, stop and ask. Never invent scope beyond the spec.
 - `data/presets/` — pre-generated fallback policies; never edit by hand
 - `data/ai-index.ts` — Ramp AI Index public dataset extract; generated, never edit by hand; every rendered number from it gets a citation
 - `prompts/policy-skill.md` — the generation prompt; NEVER modify without explicit instruction
-- `content/` — memo and site copy; NEVER modify without explicit instruction
+- `content/site-copy.md` — the only source for site copy; render verbatim, NEVER modify
+- `content/memo.md` — memo prose; NEVER modify without explicit instruction
 - `LOG.md` — build log; append-only, human-written; do not edit
 
 ## Design tokens
