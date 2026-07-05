@@ -1,0 +1,12 @@
+[
+  { "company_name": "Series C SaaS", "headcount_band": "101-500", "sector": "software", "ai_maturity": "scaling", "strictness": "normal" },
+  { "company_name": "Series C SaaS", "headcount_band": "101-500", "sector": "software", "ai_maturity": "scaling", "strictness": "normal" },
+  { "company_name": "Seed AI lab", "headcount_band": "1-25", "sector": "ai_native", "ai_maturity": "scaling", "strictness": "strict" },
+  { "company_name": "Growth SaaS", "headcount_band": "101-500", "sector": "software", "ai_maturity": "scaling", "strictness": "loose" },
+  { "company_name": "Regional manufacturer", "headcount_band": "501-2000", "sector": "manufacturing", "ai_maturity": "experimenting", "strictness": "strict" },
+  { "company_name": "Hospital network", "headcount_band": "501-2000", "sector": "healthcare", "ai_maturity": "experimenting", "strictness": "strict" },
+  { "company_name": "Solo agent studio", "headcount_band": "1-25", "sector": "ai_native", "ai_maturity": "dependent", "strictness": "loose" },
+  { "company_name": "Global industrial", "headcount_band": "2000+", "sector": "manufacturing", "ai_maturity": "experimenting", "strictness": "normal" },
+  { "company_name": "Retail co", "headcount_band": "26-100", "sector": "retail", "ai_maturity": "scaling", "strictness": "strict" },
+  { "company_name": "Consulting group", "headcount_band": "101-500", "sector": "services", "ai_maturity": "dependent", "strictness": "normal" }
+]

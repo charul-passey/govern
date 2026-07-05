@@ -52,14 +52,31 @@ function extractPolicy(text: string): Policy {
   return policySchema.parse(JSON.parse(text.slice(start, end + 1)));
 }
 
-// Calls Claude and validates. On schema failure, retries once with the validation
-// errors appended. Throws if the second attempt also fails; the caller falls back.
-export async function generateWithClaude(profile: CompanyProfile): Promise<Policy> {
+function describeError(err: unknown, profile: CompanyProfile): string {
+  return err instanceof z.ZodError
+    ? `Schema errors: ${JSON.stringify(err.issues)}`
+    : err instanceof ConformanceError
+      ? `The rules engine produced the wrong verdicts at ${profile.strictness} strictness. Adjust the policy so these verdicts come out right: ${JSON.stringify(err.mismatches)}`
+      : String(err);
+}
+
+export interface GenerationTrace {
+  policy: Policy;
+  source: "live" | "retry"; // live = passed first attempt, retry = needed a second
+  firstTrySchemaValid: boolean;
+}
+
+// Calls Claude and validates (schema, then verdict conformance). On failure,
+// retries once with the error appended. Throws if the second attempt also fails.
+// Returns a trace so callers can tell whether a retry was needed.
+export async function generateTraced(
+  profile: CompanyProfile,
+): Promise<GenerationTrace> {
   const client = new Anthropic();
   const system = systemPrompt();
   const user = buildUserMessage(profile);
 
-  const call = async (content: string): Promise<Policy> => {
+  const ask = async (content: string): Promise<string> => {
     const res = await client.messages.create({
       model: MODEL,
       max_tokens: MAX_TOKENS,
@@ -67,29 +84,33 @@ export async function generateWithClaude(profile: CompanyProfile): Promise<Polic
       system,
       messages: [{ role: "user", content }],
     });
-    const text = res.content
+    return res.content
       .map((block) => (block.type === "text" ? block.text : ""))
       .join("");
-    const policy = extractPolicy(text);
-    // Verdict conformance gate: reject if the engine does not produce the
-    // required verdicts for this strictness.
-    const mismatches = conformanceMismatches(policy, profile);
-    if (mismatches.length > 0) throw new ConformanceError(mismatches);
-    return policy;
   };
 
+  let firstTrySchemaValid = false;
+  let firstError: unknown;
   try {
-    return await call(user);
+    const policy = extractPolicy(await ask(user));
+    firstTrySchemaValid = true;
+    const mismatches = conformanceMismatches(policy, profile);
+    if (mismatches.length > 0) throw new ConformanceError(mismatches);
+    return { policy, source: "live", firstTrySchemaValid: true };
   } catch (err) {
-    const detail =
-      err instanceof z.ZodError
-        ? `Schema errors: ${JSON.stringify(err.issues)}`
-        : err instanceof ConformanceError
-          ? `The rules engine produced the wrong verdicts at ${profile.strictness} strictness. Adjust the policy so these verdicts come out right: ${JSON.stringify(err.mismatches)}`
-          : String(err);
-    const retry = `${user}\n\nYour previous output failed validation:\n${detail}\n\nReturn corrected JSON only, matching the schema exactly.`;
-    return await call(retry);
+    firstError = err;
   }
+
+  const retryPrompt = `${user}\n\nYour previous output failed validation:\n${describeError(firstError, profile)}\n\nReturn corrected JSON only, matching the schema exactly.`;
+  const policy = extractPolicy(await ask(retryPrompt));
+  const mismatches = conformanceMismatches(policy, profile);
+  if (mismatches.length > 0) throw new ConformanceError(mismatches);
+  return { policy, source: "retry", firstTrySchemaValid };
+}
+
+// Thin wrapper: the policy only. Throws if generation fails after the retry.
+export async function generateWithClaude(profile: CompanyProfile): Promise<Policy> {
+  return (await generateTraced(profile)).policy;
 }
 
 export interface GenerateResult {

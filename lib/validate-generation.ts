@@ -46,6 +46,20 @@ export type ReportEntry =
     }
   | { check: "canonical"; eventId: string; figure: string };
 
+// The benchmark multiple the policy's envelope implies, given the profile's
+// midpoint and sector median.
+export function expectedBenchmarkMultiple(
+  policy: Policy,
+  profile: CompanyProfile,
+): { computed: number; sectorMedian: number } {
+  const sectorMedian = BENCHMARKS_MAY_2026.bySector[SECTOR_ROW[profile.sector]];
+  const midpoint = MIDPOINT[profile.headcount_band];
+  const computed = round1(
+    policy.budgets.company_envelope_usd_month / (midpoint * sectorMedian),
+  );
+  return { computed, sectorMedian };
+}
+
 // (1) Recompute the benchmark multiple from the midpoint and sector median. If the
 // stated value is off by more than 0.1, overwrite the benchmark block and rewrite
 // the "Nx sector median" figure in the summary.
@@ -53,11 +67,7 @@ export function reconcileBenchmark(
   policy: Policy,
   profile: CompanyProfile,
 ): { policy: Policy; entry: Extract<ReportEntry, { check: "benchmark" }> | null } {
-  const sectorMedian = BENCHMARKS_MAY_2026.bySector[SECTOR_ROW[profile.sector]];
-  const midpoint = MIDPOINT[profile.headcount_band];
-  const computed = round1(
-    policy.budgets.company_envelope_usd_month / (midpoint * sectorMedian),
-  );
+  const { computed, sectorMedian } = expectedBenchmarkMultiple(policy, profile);
   const stated = policy.budgets.benchmark.envelope_multiple_of_median;
 
   if (Math.abs(stated - computed) <= 0.1) return { policy, entry: null };
