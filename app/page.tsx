@@ -6,12 +6,17 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main>
-      <Hero />
-      <Problem />
-      <Demo />
-      <Instruments />
-      <Footer />
-    </main>
+    <>
+      <header className="mx-auto max-w-shell px-6 pt-6">
+        <span className="text-lg font-semibold text-ink">Govern</span>
+      </header>
+      <main>
+        <Hero />
+        <Problem />
+        <Demo />
+        <Instruments />
+        <Footer />
+      </main>
+    </>
   );
 }

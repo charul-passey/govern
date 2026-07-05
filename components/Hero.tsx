@@ -38,7 +38,7 @@ export function Hero() {
               href="/memo"
               className="rounded-sm text-base font-medium text-ink/70 underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ground"
             >
-              Read the memo
+              Read the memo <span aria-hidden="true">→</span>
             </Link>
           </div>
 

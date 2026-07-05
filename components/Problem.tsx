@@ -3,7 +3,7 @@ import { AdoptionChart } from "@/components/AdoptionChart";
 // Citation mark. Rendered at caption text size and raised, so it reads as a
 // citation, not an exponent (per content/site-copy.md).
 function Cite({ n }: { n: number }) {
-  return <sup className="ml-0.5 text-sm font-medium text-ink/50">{n}</sup>;
+  return <sup className="ml-0.5 font-normal text-ink/50">{n}</sup>;
 }
 
 function StatCard({

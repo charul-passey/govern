@@ -103,6 +103,18 @@ export function AdoptionChart() {
           }}
         >
           20.1%
+          <span className="block font-mono text-xs text-ink/40">estimate</span>
+        </span>
+
+        {/* Baseline floor label, so the reader can see the lines start at zero. */}
+        <span
+          className="absolute -translate-y-1/2 font-mono text-xs text-ink/40"
+          style={{
+            left: `${(PAD.left / VB_W) * 100}%`,
+            top: `${(yAt(0) / VB_H) * 100}%`,
+          }}
+        >
+          0%
         </span>
       </div>
 
