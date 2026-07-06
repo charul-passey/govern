@@ -117,7 +117,13 @@ export function Demo() {
   return (
     <section id="demo" className="bg-panel px-6 py-20 sm:py-24">
       <div className="mx-auto max-w-shell">
-        <ProfileStep onPreset={selectPreset} onGenerate={customize} disabled={loading} />
+        <ProfileStep
+          onPreset={selectPreset}
+          onGenerate={customize}
+          disabled={loading}
+          activeCompany={origin?.kind === "preset" ? origin.company : null}
+          customActive={origin?.kind === "custom"}
+        />
         <PolicyArtifact
           policy={policy}
           prevPolicy={prevPolicy}

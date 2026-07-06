@@ -23,6 +23,9 @@ const config: Config = {
         shell: "1120px", // max page shell
         prose: "720px", // prose measure
       },
+      borderWidth: {
+        "1.5": "1.5px", // selected card / control outline
+      },
       keyframes: {
         "slide-fade-in": {
           "0%": { opacity: "0", transform: "translateY(8px)" },

@@ -52,10 +52,14 @@ export function ProfileStep({
   onPreset,
   onGenerate,
   disabled,
+  activeCompany,
+  customActive,
 }: {
   onPreset: (company: string) => void;
   onGenerate: (profile: CompanyProfile) => void;
   disabled: boolean;
+  activeCompany: string | null;
+  customActive: boolean;
 }) {
   const [custom, setCustom] = useState(false);
   const [headcount, setHeadcount] = useState<Headcount>("101-500");
@@ -73,25 +77,40 @@ export function ProfileStep({
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset.id}
-            type="button"
-            disabled={disabled}
-            onClick={() => onPreset(preset.id)}
-            className="rounded-md border border-ink/10 bg-ground p-4 text-left transition-colors hover:border-ink/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-50"
-          >
-            <div className="font-semibold text-ink">{preset.name}</div>
-            <div className="mt-1 text-sm text-ink/60">{preset.detail}</div>
-          </button>
-        ))}
+        {PRESETS.map((preset) => {
+          const selected = activeCompany === preset.id && !custom;
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              disabled={disabled}
+              aria-pressed={selected}
+              onClick={() => {
+                setCustom(false);
+                onPreset(preset.id);
+              }}
+              className={
+                selected
+                  ? "rounded-md border-1.5 border-ink bg-ink/5 p-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-50"
+                  : "rounded-md border border-ink/10 bg-ground p-4 text-left transition-colors hover:border-ink/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-50"
+              }
+            >
+              <div className="font-semibold text-ink">{preset.name}</div>
+              <div className="mt-1 text-sm text-ink/60">{preset.detail}</div>
+            </button>
+          );
+        })}
       </div>
 
       <button
         type="button"
         onClick={() => setCustom((v) => !v)}
         aria-expanded={custom}
-        className="mt-4 rounded-sm text-sm font-medium text-ink/70 underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        className={
+          customActive
+            ? "mt-4 rounded-md border-1.5 border-ink bg-ink/5 px-3 py-1.5 text-sm font-medium text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            : "mt-4 rounded-sm text-sm font-medium text-ink/70 underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        }
       >
         Customize {custom ? "−" : "+"}
       </button>
