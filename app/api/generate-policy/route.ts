@@ -1,8 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { profileSchema } from "@/lib/profile";
-import { resolvePolicy } from "@/lib/generate-policy";
+import { policyCoreSchema } from "@/lib/policy-schema";
+import {
+  resolvePolicyPhase1,
+  resolveRationalesPhase2,
+  cachedPhase1,
+  cachedRationales,
+} from "@/lib/generate-policy";
 import { rateLimit } from "@/lib/rate-limit";
-import { nearestPreset } from "@/lib/presets";
 import { FLOOR_POLICY } from "@/lib/fallback-policy";
 
 export const runtime = "nodejs";
@@ -12,49 +17,47 @@ function clientIp(req: NextRequest): string {
   return forwarded ? forwarded.split(",")[0].trim() : "local";
 }
 
-async function readProfile(req: NextRequest) {
-  try {
-    return profileSchema.safeParse(await req.json());
-  } catch {
-    return { success: false } as const;
-  }
-}
-
-// Fail-soft POST. Every path returns a usable policy and a fallback flag; a raw
-// error is never surfaced to the UI.
+// Two-phase, fail-soft. phase "policy" (default) returns a validated policy
+// without rationales; phase "rationales" returns validated rationales for a
+// supplied policy. A raw error is never surfaced.
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
 
-  // Rate limited: return a cached policy without calling the model.
-  if (!rateLimit(ip)) {
-    const parsed = await readProfile(req);
-    const preset = parsed.success ? nearestPreset(parsed.data) : null;
-    return NextResponse.json({
-      policy: preset ?? FLOOR_POLICY,
-      source: preset ? "preset" : "floor",
-      fallback: true,
-      reason: "rate_limited",
-    });
+  let body: { profile?: unknown; phase?: unknown; policy?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    body = {};
   }
 
-  const parsed = await readProfile(req);
-  if (!parsed.success) {
+  if (body.phase === "rationales") {
+    const profile = profileSchema.safeParse(body.profile);
+    const core = policyCoreSchema.safeParse(body.policy);
+    if (!profile.success || !core.success) {
+      return NextResponse.json({ rationales: {}, report: [] });
+    }
+    if (!rateLimit(ip)) {
+      return NextResponse.json(cachedRationales(core.data));
+    }
+    return NextResponse.json(await resolveRationalesPhase2(profile.data, core.data));
+  }
+
+  // phase: policy
+  const profile = profileSchema.safeParse(body.profile);
+  if (!profile.success) {
+    const { rationales, ...core } = FLOOR_POLICY;
     return NextResponse.json({
-      policy: FLOOR_POLICY,
+      policy: core,
+      rationales,
       source: "floor",
       fallback: true,
+      rationalesPending: false,
+      report: [],
       reason: "invalid_profile",
     });
   }
-
-  try {
-    return NextResponse.json(await resolvePolicy(parsed.data));
-  } catch {
-    return NextResponse.json({
-      policy: FLOOR_POLICY,
-      source: "floor",
-      fallback: true,
-      reason: "error",
-    });
+  if (!rateLimit(ip)) {
+    return NextResponse.json({ ...cachedPhase1(profile.data), reason: "rate_limited" });
   }
+  return NextResponse.json(await resolvePolicyPhase1(profile.data));
 }

@@ -117,7 +117,7 @@ const responseLadderSchema = z.tuple([
 ]);
 
 // One rationale per event id, all fourteen required.
-const rationalesSchema = z.object({
+export const rationalesSchema = z.object({
   e1: z.string(),
   e2: z.string(),
   e3: z.string(),
@@ -148,3 +148,10 @@ export const policySchema = z.object({
 });
 
 export type Policy = z.infer<typeof policySchema>;
+
+// The policy without rationales, used for phase-one (fast) generation. The full
+// schema, presets, and floor are unchanged; this is additive.
+export const policyCoreSchema = policySchema.omit({ rationales: true });
+export type PolicyCore = z.infer<typeof policyCoreSchema>;
+
+export type Rationales = z.infer<typeof rationalesSchema>;
