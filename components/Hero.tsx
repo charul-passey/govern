@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { BUILD_START, daysSince } from "@/lib/constants";
+import { BUILD_DAYS } from "@/lib/constants";
 
 export function Hero() {
-  const days = daysSince(BUILD_START);
+  const days = BUILD_DAYS;
   const dayLabel = days === 1 ? "day" : "days";
 
   return (
