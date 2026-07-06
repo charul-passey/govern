@@ -86,8 +86,10 @@ export function AdoptionChart() {
           />
         </svg>
 
+        {/* End labels sit at the line end on wider screens; on narrow screens they
+            right-anchor to the column edge so fixed-size text never overflows. */}
         <span
-          className="absolute -translate-y-1/2 pl-1 font-mono text-xs font-medium text-ink"
+          className="absolute hidden -translate-y-1/2 pl-1 font-mono text-xs font-medium text-ink sm:block"
           style={{
             left: `${(xAt(rampEnd.i) / VB_W) * 100}%`,
             top: `${(yAt(rampEnd.v) / VB_H) * 100}%`,
@@ -96,11 +98,25 @@ export function AdoptionChart() {
           54.2%
         </span>
         <span
-          className="absolute -translate-y-1/2 pl-1 font-mono text-xs text-ink/50"
+          className="absolute right-0 -translate-y-1/2 pr-1 text-right font-mono text-xs font-medium text-ink sm:hidden"
+          style={{ top: `${(yAt(rampEnd.v) / VB_H) * 100}%` }}
+        >
+          54.2%
+        </span>
+
+        <span
+          className="absolute hidden -translate-y-1/2 pl-1 font-mono text-xs text-ink/50 sm:block"
           style={{
             left: `${(xAt(censusEnd.i) / VB_W) * 100}%`,
             top: `${(yAt(censusEnd.v) / VB_H) * 100}%`,
           }}
+        >
+          20.1%
+          <span className="block font-mono text-xs text-ink/40">estimate</span>
+        </span>
+        <span
+          className="absolute right-0 -translate-y-1/2 pr-1 text-right font-mono text-xs text-ink/50 sm:hidden"
+          style={{ top: `${(yAt(censusEnd.v) / VB_H) * 100}%` }}
         >
           20.1%
           <span className="block font-mono text-xs text-ink/40">estimate</span>
