@@ -66,7 +66,7 @@ export function VerdictCard({
                   <button
                     type="button"
                     onClick={() => onClause(c)}
-                    className="rounded-sm font-mono text-xs text-ink/70 underline-offset-2 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                    className="break-all rounded-sm text-left font-mono text-xs text-ink/70 underline-offset-2 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                   >
                     {c}
                   </button>

@@ -113,10 +113,13 @@ export function BurnTimeline({
 
   return (
     <figure className="mt-4">
-      <div className="relative">
-        <span className="absolute left-0 top-0 z-10 text-xs text-ink/50">
-          Cumulative AI spend · simulated week
-        </span>
+      <p className="text-xs text-ink/50">Cumulative AI spend · simulated week</p>
+      {ghost && ghostVisible && (
+        <p className="mt-1 font-mono text-xs text-verdict-blocked/80 sm:hidden">
+          +$1,090 by 06:00 without policy
+        </p>
+      )}
+      <div className="relative mt-2">
         <svg
           viewBox={`0 0 ${W} ${VBH}`}
           className="block w-full overflow-visible"
@@ -156,7 +159,7 @@ export function BurnTimeline({
 
         {ghost && ghostVisible && (
           <span
-            className="absolute -translate-x-full -translate-y-1/2 whitespace-nowrap pr-1 font-mono text-xs text-verdict-blocked/80 animate-fade-in"
+            className="absolute hidden -translate-x-full -translate-y-1/2 whitespace-nowrap pr-1 font-mono text-xs text-verdict-blocked/80 animate-fade-in sm:block"
             style={{ left: leftPct(ghost.x1), top: topPct(ghost.y1) }}
           >
             +$1,090 by 06:00 without policy
@@ -164,10 +167,7 @@ export function BurnTimeline({
         )}
 
         {totalVisible && (
-          <span
-            className="absolute -translate-x-full -translate-y-full pr-1 font-mono text-xs text-ink animate-fade-in"
-            style={{ left: leftPct(terminus.x), top: topPct(terminus.y) }}
-          >
+          <span className="absolute right-0 top-0 font-mono text-xs text-ink animate-fade-in">
             week total ${total.toLocaleString("en-US")}
           </span>
         )}

@@ -238,7 +238,11 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
           />
 
           <div className="mt-6 grid gap-6 lg:grid-cols-5">
-            <div ref={flipRef} className="space-y-3 lg:col-span-3" style={{ overflowAnchor: "none" }}>
+            <div
+              ref={flipRef}
+              className="min-w-0 space-y-3 lg:col-span-3"
+              style={{ overflowAnchor: "none" }}
+            >
               {showTally && (
                 <div data-flip-id="tally">
                   <TallyStrip tally={tally} reduced={reduced} animate={!instant} />
@@ -263,7 +267,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
             <div
               id="sim-json"
               ref={railRef}
-              className="rounded-md border border-ink/10 bg-ground p-4 lg:sticky lg:top-16 lg:col-span-2 lg:max-h-screen lg:overflow-auto"
+              className="min-w-0 rounded-md border border-ink/10 bg-ground p-4 lg:sticky lg:top-16 lg:col-span-2 lg:max-h-screen lg:overflow-auto"
             >
               <PolicyJson policy={policy} changed={NONE} />
             </div>
