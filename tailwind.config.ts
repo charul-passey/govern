@@ -28,10 +28,16 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        // one-shot flash marking a changed value after a regenerate
+        "value-flash": {
+          "0%": { backgroundColor: "rgb(228 242 34 / 0.5)" },
+          "100%": { backgroundColor: "rgb(228 242 34 / 0)" },
+        },
       },
       animation: {
-        // simulator cards only; nothing else animates
+        // simulator cards slide-fade in; changed JSON values flash once
         "slide-fade-in": "slide-fade-in 150ms ease-out",
+        "value-flash": "value-flash 800ms ease-out",
       },
     },
   },
