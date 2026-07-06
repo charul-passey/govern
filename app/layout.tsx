@@ -21,9 +21,10 @@ const HERO_DESCRIPTION =
   "Govern is a working concept for chapter two: policy, budget instruments, and enforcement for intelligence.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://govern-charul-passeys-projects.vercel.app"),
+  metadataBase: new URL("https://govern.charulpassey.com"),
   title: "Govern",
   description: HERO_DESCRIPTION,
+  alternates: { canonical: "/" },
   openGraph: {
     title: HERO_HEADLINE,
     description: HERO_DESCRIPTION,
