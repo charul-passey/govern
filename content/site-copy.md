@@ -57,3 +57,18 @@ Superscript note: footnote markers render at caption text size, vertically raise
 
 ## DISCLAIMER (footer only, not floating mid-page)
 An independent concept project. Not affiliated with Ramp. Data cited from the public sources listed above.
+
+## DEMO MICROCOPY (LOCKED — render verbatim)
+Step 1 label: STEP 1 · PROFILE
+Step 1 header: Pick a company
+Step 1 subhead: Choose a preset or set your own. Each one generates a full policy calibrated to published industry benchmarks.
+Preset badge (on preset-served policies): benchmark preset · regenerate live ↻
+Step 2 label: STEP 2 · POLICY
+Company envelope chip: {N}× sector median
+Team envelope chip: {N}% of envelope
+Fallback note: using cached policy
+Live progress stages, in order: Pulling sector benchmarks · Calibrating envelopes · Writing enforcement clauses · Validating against the engine
+Step 3 label: STEP 3 · ENFORCEMENT
+Step 3 button: Replay the week
+Skip control: Skip to summary
+New microcopy for any state not listed here must be proposed before rendering.
