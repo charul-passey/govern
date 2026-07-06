@@ -41,15 +41,23 @@ export function evaluate(policy: Policy, event: Event): EvalResult {
     }
 
     case "employee_card": {
+      const count = event.teamSubscriptionCount ?? 0;
+      const threshold = policy.shadow_ai.team_subscription_threshold;
+      const mode = policy.shadow_ai.employee_card_ai_merchants;
+      if (count < threshold) {
+        return {
+          verdict: "approved",
+          firedClauses: ["shadow_ai.team_subscription_threshold"],
+          receipts: [`subscription ${count} of ${threshold} allowed on the team; within threshold`],
+        };
+      }
       return {
-        verdict: "rerouted_shadow",
+        verdict: mode === "reroute" ? "rerouted_shadow" : "approved",
         firedClauses: [
           "shadow_ai.employee_card_ai_merchants",
           "shadow_ai.team_subscription_threshold",
         ],
-        receipts: [
-          `subscription ${event.teamSubscriptionCount} of ${policy.shadow_ai.team_subscription_threshold} allowed; routed to central contract`,
-        ],
+        receipts: [`subscription ${count} reached the ${threshold} threshold; policy mode is ${mode}`],
       };
     }
 

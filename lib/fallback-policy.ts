@@ -12,7 +12,7 @@ const core: Omit<Policy, "rationales"> = {
   meta: {
     company_name: "Series C SaaS",
     strictness: "normal",
-    summary: "Envelopes set at 4.5x sector median.",
+    summary: "Envelopes set at 2.0x sector median.",
   },
   providers: {
     allowlist: [
@@ -31,18 +31,18 @@ const core: Omit<Policy, "rationales"> = {
     },
   },
   budgets: {
-    company_envelope_usd_month: 90000,
+    company_envelope_usd_month: 40000,
     team_envelopes: [
-      { team: "Engineering", usd_month: 40000, variance_band_pct: 40, unit_cost_metric: "cost per merged PR" },
-      { team: "Product", usd_month: 12000, variance_band_pct: 40, unit_cost_metric: "cost per shipped spec" },
-      { team: "Support", usd_month: 9000, variance_band_pct: 40, unit_cost_metric: "cost per resolved ticket" },
-      { team: "GTM", usd_month: 10000, variance_band_pct: 40, unit_cost_metric: "cost per qualified lead" },
-      { team: "Data", usd_month: 9000, variance_band_pct: 40, unit_cost_metric: "cost per pipeline run" },
+      { team: "Engineering", usd_month: 18000, variance_band_pct: 40, unit_cost_metric: "cost per merged PR" },
+      { team: "Product", usd_month: 6000, variance_band_pct: 40, unit_cost_metric: "cost per shipped spec" },
+      { team: "Support", usd_month: 4000, variance_band_pct: 40, unit_cost_metric: "cost per resolved ticket" },
+      { team: "GTM", usd_month: 4000, variance_band_pct: 40, unit_cost_metric: "cost per qualified lead" },
+      { team: "Data", usd_month: 4000, variance_band_pct: 40, unit_cost_metric: "cost per pipeline run" },
     ],
     burn_alert_pct: 85,
     benchmark: {
       sector_median_per_employee_usd: 66.29,
-      envelope_multiple_of_median: 4.5,
+      envelope_multiple_of_median: 2.0,
       source: "Ramp AI Index, ramp.com/data, May 2026",
     },
   },

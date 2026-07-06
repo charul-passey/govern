@@ -58,7 +58,20 @@ async function main(): Promise<void> {
         const file = path.join(OUT_DIR, `${slug(base.company_name)}-${strictness}.json`);
         fs.writeFileSync(file, `${JSON.stringify({ profile, policy }, null, 2)}\n`);
         const note = report.length
-          ? `: ${report.map((r) => (r.check === "rationale" ? `${r.eventId}/${r.reason}` : r.check === "canonical" ? `${r.eventId}/canonical` : `benchmark ${r.statedMultiple}->${r.computedMultiple}`)).join(", ")}`
+          ? `: ${report
+              .map((r) => {
+                switch (r.check) {
+                  case "rationale":
+                    return `${r.eventId}/${r.reason}`;
+                  case "canonical":
+                    return `${r.eventId}/canonical`;
+                  case "envelope":
+                    return `envelope ${r.statedMultiple}->${r.clampedMultiple}`;
+                  case "benchmark":
+                    return `benchmark ${r.statedMultiple}->${r.computedMultiple}`;
+                }
+              })
+              .join(", ")}`
           : ": no changes";
         console.log(`OK   ${label} -> ${path.relative(process.cwd(), file)} (${report.length} fix(es)${note})`);
       } catch (err) {

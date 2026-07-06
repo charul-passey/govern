@@ -211,12 +211,51 @@ describe("branch coverage: alternate guard paths in evaluate", () => {
   });
 });
 
+describe("employee_card compares subscription count to the threshold", () => {
+  const e4 = events.find((e) => e.id === "e4")!;
+
+  it("is approved below the threshold, citing only the threshold clause", () => {
+    // loose threshold is 5, e4 count is 3.
+    const r = evaluate(makePolicy("loose"), e4);
+    expect(r.verdict).toBe("approved");
+    expect(r.firedClauses).toEqual(["shadow_ai.team_subscription_threshold"]);
+  });
+
+  it("applies the reroute mode at or above the threshold", () => {
+    // normal threshold is 3, e4 count is 3.
+    expect(evaluate(makePolicy("normal"), e4).verdict).toBe("rerouted_shadow");
+  });
+
+  it("approves at or above the threshold when the mode is allow", () => {
+    const base = makePolicy("normal");
+    const allowMode: Policy = {
+      ...base,
+      shadow_ai: {
+        ...base.shadow_ai,
+        team_subscription_threshold: 1,
+        employee_card_ai_merchants: "allow",
+      },
+    };
+    expect(evaluate(allowMode, e4).verdict).toBe("approved");
+  });
+
+  it("treats a missing count as zero, below any positive threshold", () => {
+    expect(evaluate(normal, ev({ type: "employee_card" })).verdict).toBe("approved");
+  });
+});
+
 describe("branch coverage: tally guards skip verdict-matching events missing their amounts", () => {
   it("adds nothing when the amount fields are absent", () => {
-    const tally = computeTally(normal, [
+    // Threshold zero makes the employee_card events reroute even without a count,
+    // exercising both null guards in the reroute tally branch.
+    const zero: Policy = {
+      ...normal,
+      shadow_ai: { ...normal.shadow_ai, team_subscription_threshold: 0 },
+    };
+    const tally = computeTally(zero, [
       ev({ type: "agent_loop", retries: 999 }), // blocked, no projectedOvernightUsd
       ev({ type: "employee_card" }), // rerouted, no teamSubscriptionCount
-      ev({ type: "employee_card", teamSubscriptionCount: 2 }), // rerouted, no amountUsdMonth
+      ev({ type: "employee_card", teamSubscriptionCount: 3 }), // rerouted, no amountUsdMonth
       ev({ type: "subscription" }), // consolidation, no projectedSavingsUsdYear
     ]);
     expect(tally.blockedBurnUsd).toBe(0);

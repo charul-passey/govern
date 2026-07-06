@@ -28,7 +28,25 @@ const SECTOR_ROW: Record<
   healthcare: "Health care",
 };
 
+// Envelope multiple bands by maturity, applied at every strictness. The canonical
+// multiplier is used to clamp an out-of-band envelope.
+const ENVELOPE_BANDS: Record<
+  CompanyProfile["ai_maturity"],
+  { lo: number; hi: number; canonical: number }
+> = {
+  experimenting: { lo: 0.4, hi: 0.7, canonical: 0.5 },
+  scaling: { lo: 1.5, hi: 2.5, canonical: 2 },
+  dependent: { lo: 6, hi: 10, canonical: 8 },
+};
+
 const round1 = (x: number): number => Math.round(x * 10) / 10;
+
+// Round to two significant figures, matching the skill's envelope rounding.
+function round2sig(x: number): number {
+  const magnitude = Math.floor(Math.log10(Math.abs(x)));
+  const factor = 10 ** (magnitude - 1);
+  return Math.round(x / factor) * factor;
+}
 
 export type ReportEntry =
   | {
@@ -38,6 +56,13 @@ export type ReportEntry =
       sectorMedian: number;
     }
   | {
+      check: "envelope";
+      statedMultiple: number;
+      clampedMultiple: number;
+      oldEnvelope: number;
+      newEnvelope: number;
+    }
+  | {
       check: "rationale";
       eventId: string;
       reason: "verdict_mismatch" | "clause_reference";
@@ -45,6 +70,51 @@ export type ReportEntry =
       expectedVerdict: Verdict;
     }
   | { check: "canonical"; eventId: string; figure: string };
+
+// (2) Enforce envelope magnitude. The multiple of sector median must land in the
+// maturity band, independent of strictness. If it does not, clamp the company
+// envelope to the canonical multiplier, rescale team envelopes proportionally to
+// preserve their sum percentage, and recompute the benchmark and summary.
+export function enforceEnvelopeMagnitude(
+  policy: Policy,
+  profile: CompanyProfile,
+): { policy: Policy; entry: Extract<ReportEntry, { check: "envelope" }> | null } {
+  const band = ENVELOPE_BANDS[profile.ai_maturity];
+  const { computed, sectorMedian } = expectedBenchmarkMultiple(policy, profile);
+  if (computed >= band.lo && computed <= band.hi) return { policy, entry: null };
+
+  const midpoint = MIDPOINT[profile.headcount_band];
+  const oldEnvelope = policy.budgets.company_envelope_usd_month;
+  const newEnvelope = round2sig(midpoint * sectorMedian * band.canonical);
+  const factor = newEnvelope / oldEnvelope;
+  const team_envelopes = policy.budgets.team_envelopes.map((t) => ({
+    ...t,
+    usd_month: Math.round(t.usd_month * factor),
+  }));
+  const clampedMultiple = round1(newEnvelope / (midpoint * sectorMedian));
+  const summary = policy.meta.summary.replace(
+    /\d+(\.\d+)?x sector median/i,
+    `${clampedMultiple.toFixed(1)}x sector median`,
+  );
+  const next: Policy = {
+    ...policy,
+    meta: { ...policy.meta, summary },
+    budgets: {
+      ...policy.budgets,
+      company_envelope_usd_month: newEnvelope,
+      team_envelopes,
+      benchmark: {
+        ...policy.budgets.benchmark,
+        sector_median_per_employee_usd: sectorMedian,
+        envelope_multiple_of_median: clampedMultiple,
+      },
+    },
+  };
+  return {
+    policy: next,
+    entry: { check: "envelope", statedMultiple: computed, clampedMultiple, oldEnvelope, newEnvelope },
+  };
+}
 
 // The benchmark multiple the policy's envelope implies, given the profile's
 // midpoint and sector median.
@@ -167,11 +237,13 @@ export function validateGeneration(
   policy: Policy,
   profile: CompanyProfile,
 ): { policy: Policy; report: ReportEntry[] } {
-  const benchmark = reconcileBenchmark(policy, profile);
+  const envelope = enforceEnvelopeMagnitude(policy, profile);
+  const benchmark = reconcileBenchmark(envelope.policy, profile);
   const rationale = validateRationales(benchmark.policy);
   const canonical = enforceCanonicalFigures(rationale.policy);
 
   const report: ReportEntry[] = [];
+  if (envelope.entry) report.push(envelope.entry);
   if (benchmark.entry) report.push(benchmark.entry);
   for (const r of rationale.report) {
     report.push({

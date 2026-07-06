@@ -50,7 +50,7 @@ function detail(policy: Policy, event: Event, result: EvalResult): string {
     case "subscription":
       return `Overlapping tool, about ${event.projectedSavingsUsdYear} per year saved if merged.`;
     case "new_provider":
-      return `Unrecognized provider under a ${policy.providers.new_provider_rule.action} new-provider rule.`;
+      return `Unrecognized provider charged ${event.amountUsd}; the new-provider rule is set to ${policy.providers.new_provider_rule.action}.`;
     case "classification":
       return `Charge reclassified to ${policy.classification.default_class} under the tag rules.`;
     case "burn_pacing":
