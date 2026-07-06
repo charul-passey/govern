@@ -55,6 +55,33 @@ Footnotes (small type, section bottom):
 
 Superscript note: footnote markers render at caption text size, vertically raised. They should read like citation marks, never like exponents.
 
+## INSTRUMENTS SECTION (LOCKED — render verbatim)
+
+Section label: INSTRUMENTS
+Header: Budgets for spend that thinks
+
+Body (three paragraphs):
+
+A cap is not an instrument. It is a surrender: one number, set once, blind to whether the spend it blocks was waste or the best money the company spent that month. Volatile, machine-initiated spend needs instruments the way portfolios need them: tools that price variance instead of forbidding it.
+
+Govern's policies carry three. Variance bands hold each team to a tolerance around its envelope, so a 96% overnight jump in unit cost gets caught while a growing team's healthy ramp does not. Response ladders make enforcement proportional: alert, then throttle, then block, each step reversible until the last. And routing economics make the default cheap: efficient models by default, frontier models by exception, because the spread between tiers is the single largest lever in any AI budget.
+
+One number these policies never use: cost per token. Unit costs only mean something operational. Cost per resolved ticket. Cost per merged PR. Cost per qualified lead. A budget denominated in work can be governed; a budget denominated in tokens can only be watched. Strictness, in this scheme, never changes the size of a budget. It changes the controls around it.
+
+Calculator title: Routing economics
+Calculator subtitle: The spread between model tiers is the lever. Drag it.
+Calculator inputs: Monthly volume (Mtok) · Share routed to frontier (%) · Frontier price ($/Mtok, editable) · Efficient price ($/Mtok, editable)
+Calculator defaults: 500 Mtok · 10% frontier · $15.00 · $0.80
+Calculator outputs: monthly cost with routing vs all-frontier; annualized savings as the single yellow figure, labeled "saved per year by routing"
+Calculator note (small type): Prices are illustrative and editable. The ratio is the point.
+
+Closing beat: use the locked closing paragraph from GOVERN_SPEC.md §3 verbatim (the Stripe Sessions paragraph, ending "you cannot price what you cannot govern.").
+
+## FOOTER (LOCKED — render verbatim)
+
+About line: Govern is a concept project by Charul Passey, a payments and pricing product manager. It was built in {N} days with Claude Code. The build log has the receipts.
+Links: Read the memo · Build log · Resume (PDF) · LinkedIn · charulpassey.com
+
 ## DISCLAIMER (footer only, not floating mid-page)
 An independent concept project. Not affiliated with Ramp. Data cited from the public sources listed above.
 
