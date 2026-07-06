@@ -63,6 +63,13 @@ export type ReportEntry =
       newEnvelope: number;
     }
   | {
+      check: "team_sum";
+      statedPct: number;
+      newPct: number;
+      oldSum: number;
+      newSum: number;
+    }
+  | {
       check: "rationale";
       eventId: string;
       reason: "verdict_mismatch" | "clause_reference";
@@ -128,6 +135,39 @@ export function expectedBenchmarkMultiple(
     policy.budgets.company_envelope_usd_month / (midpoint * sectorMedian),
   );
   return { computed, sectorMedian };
+}
+
+// Enforce the team-envelope sum band. If the team envelopes sum outside 85-95% of
+// the company envelope, rescale them proportionally to land the sum at 90%, each
+// rounded to two significant figures, and record the change.
+export function enforceTeamSum(
+  policy: Policy,
+): { policy: Policy; entry: Extract<ReportEntry, { check: "team_sum" }> | null } {
+  const company = policy.budgets.company_envelope_usd_month;
+  const oldSum = policy.budgets.team_envelopes.reduce((s, t) => s + t.usd_month, 0);
+  const pct = oldSum / company;
+  if (pct >= 0.85 && pct <= 0.95) return { policy, entry: null };
+
+  const factor = (0.9 * company) / oldSum;
+  const team_envelopes = policy.budgets.team_envelopes.map((t) => ({
+    ...t,
+    usd_month: round2sig(t.usd_month * factor),
+  }));
+  const newSum = team_envelopes.reduce((s, t) => s + t.usd_month, 0);
+  const next: Policy = {
+    ...policy,
+    budgets: { ...policy.budgets, team_envelopes },
+  };
+  return {
+    policy: next,
+    entry: {
+      check: "team_sum",
+      statedPct: Math.round(pct * 100),
+      newPct: Math.round((newSum / company) * 100),
+      oldSum,
+      newSum,
+    },
+  };
 }
 
 // (1) Recompute the benchmark multiple from the midpoint and sector median. If the
@@ -238,12 +278,14 @@ export function validateGeneration(
   profile: CompanyProfile,
 ): { policy: Policy; report: ReportEntry[] } {
   const envelope = enforceEnvelopeMagnitude(policy, profile);
-  const benchmark = reconcileBenchmark(envelope.policy, profile);
+  const teamSum = enforceTeamSum(envelope.policy);
+  const benchmark = reconcileBenchmark(teamSum.policy, profile);
   const rationale = validateRationales(benchmark.policy);
   const canonical = enforceCanonicalFigures(rationale.policy);
 
   const report: ReportEntry[] = [];
   if (envelope.entry) report.push(envelope.entry);
+  if (teamSum.entry) report.push(teamSum.entry);
   if (benchmark.entry) report.push(benchmark.entry);
   for (const r of rationale.report) {
     report.push({

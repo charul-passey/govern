@@ -10,7 +10,7 @@
     "meta": {
       "company_name": "Industrial mfg",
       "strictness": "normal",
-      "summary": "AI spend envelopes set at 0.5x sector median for a 1200-employee manufacturing company experimenting with AI, with normal-strictness controls on agents, routing, and shadow subscriptions."
+      "summary": "AI spend envelopes set at 0.5x sector median for a 1200-employee manufacturing company experimenting with AI, with normal approval controls and rerouting of shadow subscriptions."
     },
     "providers": {
       "allowlist": [
@@ -25,12 +25,12 @@
           "data_terms_reviewed": true
         },
         {
-          "name": "Google DeepMind",
+          "name": "Google Vertex AI",
           "tier": "secondary",
           "data_terms_reviewed": true
         },
         {
-          "name": "Cohere",
+          "name": "AWS Bedrock",
           "tier": "secondary",
           "data_terms_reviewed": true
         }
@@ -54,32 +54,32 @@
       "team_envelopes": [
         {
           "team": "Engineering",
-          "usd_month": 1750,
+          "usd_month": 1800,
           "variance_band_pct": 35,
           "unit_cost_metric": "cost per merged PR"
         },
         {
-          "team": "Operations",
+          "team": "ML Platform",
           "usd_month": 1100,
           "variance_band_pct": 40,
-          "unit_cost_metric": "cost per automated work order"
+          "unit_cost_metric": "cost per model deployment"
         },
         {
           "team": "Support",
-          "usd_month": 750,
+          "usd_month": 700,
           "variance_band_pct": 35,
           "unit_cost_metric": "cost per resolved ticket"
         },
         {
           "team": "Data",
-          "usd_month": 500,
-          "variance_band_pct": 40,
+          "usd_month": 450,
+          "variance_band_pct": 35,
           "unit_cost_metric": "cost per pipeline run"
         },
         {
           "team": "GTM",
           "usd_month": 300,
-          "variance_band_pct": 35,
+          "variance_band_pct": 30,
           "unit_cost_metric": "cost per qualified lead"
         }
       ],
@@ -100,21 +100,21 @@
         "merchant_scopes": [
           "data-licensing",
           "api-inference",
-          "developer-tools"
+          "cloud-compute"
         ]
       }
     },
     "shadow_ai": {
       "employee_card_ai_merchants": "reroute",
-      "team_subscription_threshold": 3,
-      "reimbursement_rule": "AI tool purchases on personal or employee cards are not reimbursable if an approved equivalent exists on the company allowlist or if the team has reached its subscription threshold."
+      "team_subscription_threshold": 2,
+      "reimbursement_rule": "AI tool purchases on personal or employee cards are not reimbursable if an approved equivalent exists on the company allowlist or a team subscription is already active."
     },
     "classification": {
       "default_class": "OpEx",
       "rules": [
         {
           "match": "project_tag",
-          "value": "customer-facing-product",
+          "value": "customer-facing-api",
           "class": "COGS"
         },
         {
@@ -124,14 +124,14 @@
         },
         {
           "match": "project_tag",
-          "value": "internal-tool",
+          "value": "internal-tooling",
           "class": "OpEx"
         }
       ]
     },
     "approvals": {
       "fine_tune_over_usd": 4000,
-      "contract_over_usd": 10000,
+      "contract_over_usd": 5000,
       "new_provider_approver": "Engineering lead",
       "frontier_exception_approver": "Engineering lead"
     },
@@ -154,25 +154,25 @@
         "step": 3,
         "trigger": "Company envelope burn reaches 110% or unattributed spend exceeds $500 in a rolling 24-hour window",
         "action": "block",
-        "window_hours": 12,
+        "window_hours": 4,
         "owner": "Controller"
       }
     ],
     "rationales": {
-      "e1": "Support team daily run rate of $211 on Claude Sonnet maps to roughly $6,300/month, within the $1,500 Support envelope when attributed correctly; production inference in a customer-facing triage service is classified COGS under the environment:production rule.",
-      "e2": "Data team nightly embeddings job at $38/day is approximately $1,140/month, within the $1,000 Data envelope at normal variance; routine batch workload on an allowlisted provider, no action required.",
-      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 35% variance band on the Engineering envelope; likely cause is a model-tier upgrade or prompt-length regression introduced in the deploy, requiring Engineering lead review.",
-      "e4": "Marketing has now recorded three ChatGPT Team subscriptions this quarter, reaching the team_subscription_threshold of 3; this charge is rerouted to the approved OpenAI enterprise agreement per the shadow AI policy.",
+      "e1": "Support team daily run rate of $211 on Claude Sonnet maps to roughly $6,300/month, within the $700 Support envelope when annualized against the production classification rule tagging this as COGS.",
+      "e2": "Data team nightly embeddings at $38/day is approximately $1,140/month, within the $450 Data envelope at normal variance; routine pass with no action required.",
+      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 35% variance band on the Engineering envelope; likely a model routing regression or prompt-length regression introduced in the deploy.",
+      "e4": "Marketing has three ChatGPT Team subscriptions this quarter, exceeding the team_subscription_threshold of 2; the third charge is rerouted to the approved OpenAI enterprise agreement per the shadow AI reroute rule.",
       "e5": "The $4,800 fine-tune request from ML Platform exceeds the $4,000 fine_tune_over_usd threshold and requires Engineering lead approval before the job is queued.",
-      "e6": "The Growth team research agent reached 340 retries per hour, exceeding the 25-retry limit, and its $47/hr burn rate exceeded the $40/hr kill threshold; the agent was terminated, preventing an estimated $1,090 in uncontrolled spend.",
-      "e7": "Growth team frontier-model exception for the demo build is approved: the request falls within the 72-hour window and the incremental cost is within the $250 max_delta_usd cap, with Engineering lead sign-off.",
-      "e8": "A junior engineer personal API key running at 22x baseline with no project tag triggers ladder step 2 throttle; spend is paused for 48 hours pending Engineering lead attribution review, preserving the experimentation carve-out once tagged.",
-      "e9": "Procurement agent dataset license purchase of $499 is within the $600 single_txn_ceiling_usd and falls under the data-licensing merchant scope; transaction is approved.",
-      "e10": "The Design team AI video trial at $89/month duplicates a Sales-held tool with 40% seat utilization and $1,400/year contract value; consolidating to the existing contract recovers $840 in annualized unused seat value.",
-      "e11": "A $120 charge from an unrecognized inference provider in Engineering triggers the new_provider_rule; spend is held and Engineering lead must complete the provider approval questionnaire before further charges are processed.",
-      "e12": "Inference tagged internal-tool was misclassified as COGS; the classification rule match:project_tag value:internal-tool overrides to OpEx and the transaction is corrected.",
-      "e13": "Month-to-date spend at 87% of the company envelope with 9 days remaining has crossed the 82% burn_alert_pct threshold; the alert has fired and team leads are notified to pace remaining spend, no throttle required yet.",
-      "e14": "Weekly rollup complete; all team envelopes within policy bands, one open provider approval pending for e11, and the e6 agent termination logged for Growth team retrospective."
+      "e6": "The Growth team research agent reached 340 retries per hour against the 25-retry limit and $47/hr against the $40/hr kill threshold; the loop was terminated, preventing an estimated $1,090 in uncontrolled burn.",
+      "e7": "Growth team frontier exception for the demo build is within the 72-hour window and the incremental cost delta is below the $250 max_delta_usd cap; Engineering lead approval routes this through the standard exception flow.",
+      "e8": "A junior engineer personal API key spiked to 22x baseline with no project tag; ladder step 2 throttles the key and Engineering lead is notified within 48 hours, preserving the experimentation carve-out pending tag attribution.",
+      "e9": "The procurement agent dataset license purchase of $499 falls within the $600 single_txn_ceiling_usd and the data-licensing merchant scope; transaction is approved and logged.",
+      "e10": "The Design team AI video trial at $89/month duplicates the Sales tool already under contract at $1,400/year with 40% seat utilization; consolidating onto the existing contract recovers $840 in annualized unused seat value.",
+      "e11": "A $120 charge from an unrecognized inference provider in Engineering triggers the new_provider_rule; the charge is held pending Engineering lead approval and the provider security questionnaire.",
+      "e12": "Inference tagged to internal-tooling was misclassified as COGS; the classification rule matching project_tag internal-tooling to OpEx corrects the entry and the charge is rebooked.",
+      "e13": "Month-to-date spend at 87% of the company envelope with 9 days remaining has crossed the 82% burn_alert_pct threshold; the alert fired on schedule and pacing is under review by the team lead.",
+      "e14": "Weekly rollup complete; no policy breaches outstanding beyond items already escalated this cycle."
     }
   }
 }

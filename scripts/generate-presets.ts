@@ -67,6 +67,8 @@ async function main(): Promise<void> {
                     return `${r.eventId}/canonical`;
                   case "envelope":
                     return `envelope ${r.statedMultiple}->${r.clampedMultiple}`;
+                  case "team_sum":
+                    return `team-sum ${r.statedPct}%->${r.newPct}%`;
                   case "benchmark":
                     return `benchmark ${r.statedMultiple}->${r.computedMultiple}`;
                 }

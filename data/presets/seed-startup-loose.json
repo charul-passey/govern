@@ -10,7 +10,7 @@
     "meta": {
       "company_name": "Seed startup",
       "strictness": "loose",
-      "summary": "AI spend policy for a scaling ai_native seed startup with envelopes set at 2.0x sector median, governing 5 teams under a $20,000 monthly company envelope."
+      "summary": "AI spend envelopes set at 2.1x sector median, with lightweight controls calibrated for a scaling ai_native team of up to 25 people."
     },
     "providers": {
       "allowlist": [
@@ -50,35 +50,35 @@
       }
     },
     "budgets": {
-      "company_envelope_usd_month": 2000,
+      "company_envelope_usd_month": 2100,
       "team_envelopes": [
         {
           "team": "Engineering",
-          "usd_month": 800,
+          "usd_month": 850,
           "variance_band_pct": 60,
           "unit_cost_metric": "cost per merged PR"
         },
         {
           "team": "ML Platform",
-          "usd_month": 500,
+          "usd_month": 470,
           "variance_band_pct": 65,
           "unit_cost_metric": "cost per model experiment"
         },
         {
-          "team": "Data",
-          "usd_month": 250,
-          "variance_band_pct": 55,
-          "unit_cost_metric": "cost per pipeline run"
-        },
-        {
           "team": "Growth",
-          "usd_month": 150,
+          "usd_month": 280,
           "variance_band_pct": 60,
           "unit_cost_metric": "cost per qualified lead"
         },
         {
+          "team": "Data",
+          "usd_month": 190,
+          "variance_band_pct": 55,
+          "unit_cost_metric": "cost per pipeline run"
+        },
+        {
           "team": "Support",
-          "usd_month": 100,
+          "usd_month": 95,
           "variance_band_pct": 50,
           "unit_cost_metric": "cost per resolved ticket"
         }
@@ -86,7 +86,7 @@
       "burn_alert_pct": 90,
       "benchmark": {
         "sector_median_per_employee_usd": 66.29,
-        "envelope_multiple_of_median": 2,
+        "envelope_multiple_of_median": 2.1,
         "source": "Ramp AI Index, ramp.com/data, May 2026"
       }
     },
@@ -99,16 +99,16 @@
         "single_txn_ceiling_usd": 600,
         "merchant_scopes": [
           "data-licensing",
-          "inference-api",
+          "api-credits",
           "cloud-compute",
-          "developer-tools"
+          "saas-tooling"
         ]
       }
     },
     "shadow_ai": {
       "employee_card_ai_merchants": "flag",
       "team_subscription_threshold": 5,
-      "reimbursement_rule": "AI tool purchases on personal or employee cards are reimbursable up to $50/month per employee only when the tool has no equivalent on the approved allowlist and the employee submits a use-case note within 7 days of purchase."
+      "reimbursement_rule": "AI tool purchases on personal or employee cards are reimbursable up to $50/month per employee only when no approved equivalent exists on the company allowlist and the receipt is submitted within 30 days."
     },
     "classification": {
       "default_class": "OpEx",
@@ -130,12 +130,7 @@
         },
         {
           "match": "project_tag",
-          "value": "internal-tooling",
-          "class": "OpEx"
-        },
-        {
-          "match": "environment",
-          "value": "dev",
+          "value": "internal-tool",
           "class": "OpEx"
         }
       ]
@@ -156,34 +151,34 @@
       },
       {
         "step": 2,
-        "trigger": "Team envelope burn exceeds 100% or company envelope reaches 95%",
+        "trigger": "Team envelope burn reaches 110% of monthly allocation",
         "action": "throttle",
         "window_hours": 12,
         "owner": "Engineering lead"
       },
       {
         "step": 3,
-        "trigger": "Company envelope burn exceeds 110% or any agent kill threshold breached",
+        "trigger": "Company envelope burn reaches 125% of monthly allocation",
         "action": "block",
         "window_hours": 4,
         "owner": "CFO"
       }
     ],
     "rationales": {
-      "e1": "Support team production inference at $211/day runs within the $1,000/month Support envelope and is correctly tagged to a customer-facing service, classifying as COGS under the production project-tag rule.",
-      "e2": "Data team nightly embeddings at $38 falls well within the $2,500/month Data envelope and requires no action; routine pass under standard OpEx classification.",
-      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 60% variance band on the Engineering envelope; likely cause is a model-version or prompt-size regression introduced in the deploy, flagged for Engineering lead review.",
+      "e1": "Support team production inference at $211/day runs within the $100/month Support envelope on a daily basis and is correctly tagged to a production environment, routing it to COGS with no action required.",
+      "e2": "Data team nightly embeddings at $38 falls well within the $200/month Data envelope and carries a routine pipeline tag, so this charge is admitted and classified as OpEx without intervention.",
+      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 60% variance band on the Engineering envelope; the most likely cause is an accidental model tier upgrade or a prompt-length regression introduced in the deploy.",
       "e4": "Subscription 3 for Marketing against a 5 subscription threshold. Approved.",
       "e5": "Fine-tune estimate 4800 against the 15000 approval line. Approved.",
       "e6": "340 retries at 47 per hour, over the 50 retry limit. About 1090 in overnight burn prevented. Blocked, owner paged.",
-      "e7": "Growth team frontier-model exception for the demo build is self-serve eligible under the 168-hour window with a $1,000 max delta cap; the request is approved provided incremental cost stays within that cap.",
-      "e8": "Junior engineer personal API key at 22x baseline with no project tag triggers ladder step 2 throttle; the unattributed spend is paused pending tag assignment, preserving the experimentation carve-out once the project is identified and tagged.",
-      "e9": "Procurement agent dataset license purchase of $499 falls within the $600 single-transaction ceiling and the data-licensing merchant scope on the agent card; transaction is approved.",
-      "e10": "The Design team AI video tool at $89/month overlaps with the Sales team tool at $1,400/year running at 40% seat utilization; consolidating to the existing contract recovers $840 in annualized unused seat value and the new trial subscription is rerouted.",
+      "e7": "Growth team frontier-model exception for the demo build is self-serve eligible under the 168-hour window and the requested cost delta is within the $1,000 max_delta_usd cap, so this exception is approved without escalation.",
+      "e8": "A junior engineer personal API key running at 22x baseline with no project tag triggers step 2 throttle; the unattributed spend is paused pending a valid project tag, preserving the engineer's ability to resume once attribution is confirmed.",
+      "e9": "The procurement agent's $499 dataset license purchase falls within the $600 single-transaction ceiling and the data-licensing merchant scope on the agent card, so the transaction is approved and recorded.",
+      "e10": "The Design team's $89/month AI video trial overlaps with the Sales team's $1,400/year contract running at 40% seat utilization; consolidating onto the existing contract recovers $840 in annualized unused seat value.",
       "e11": "Unrecognized provider charged 120; the new-provider rule is set to allow_with_review. Approved.",
-      "e12": "Inference tagged to internal-tooling is reclassified from COGS to OpEx under the internal-tooling project-tag rule; no financial restatement required if caught within the same accounting period.",
+      "e12": "Inference tagged to an internal tool was submitted as COGS, but the internal-tool project tag maps explicitly to OpEx under the classification rules; the charge is reclassified to OpEx.",
       "e13": "Company spend at 87% of envelope against a 90% burn alert, 9 days left. Approved.",
-      "e14": "Weekly rollup. Week closed."
+      "e14": "Weekly rollup complete; all team envelopes, classification rules, and agent guardrails are within policy parameters and no outstanding escalations remain open."
     }
   }
 }

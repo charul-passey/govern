@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   reconcileBenchmark,
   enforceEnvelopeMagnitude,
+  enforceTeamSum,
   conformanceMismatches,
   enforceCanonicalFigures,
   validateGeneration,
@@ -99,6 +100,36 @@ describe("(2) envelope magnitude", () => {
     const sum = policy.budgets.team_envelopes.reduce((s, t) => s + t.usd_month, 0);
     const after = sum / policy.budgets.company_envelope_usd_month;
     expect(Math.abs(after - before)).toBeLessThan(0.02);
+  });
+});
+
+describe("team envelope sum band", () => {
+  it("leaves an in-band team sum untouched", () => {
+    // The floor sums to 90% of the company envelope.
+    expect(enforceTeamSum(FLOOR_POLICY).entry).toBeNull();
+  });
+
+  it("rescales a 96% team sum back into band", () => {
+    const doctored: Policy = {
+      ...FLOOR_POLICY,
+      budgets: {
+        ...FLOOR_POLICY.budgets,
+        // Sum 38400 against the 40000 envelope = 96%.
+        team_envelopes: [
+          { team: "Engineering", usd_month: 19200, variance_band_pct: 40, unit_cost_metric: "cost per merged PR" },
+          { team: "Product", usd_month: 6400, variance_band_pct: 40, unit_cost_metric: "cost per shipped spec" },
+          { team: "Support", usd_month: 4400, variance_band_pct: 40, unit_cost_metric: "cost per resolved ticket" },
+          { team: "GTM", usd_month: 4400, variance_band_pct: 40, unit_cost_metric: "cost per qualified lead" },
+          { team: "Data", usd_month: 4000, variance_band_pct: 40, unit_cost_metric: "cost per pipeline run" },
+        ],
+      },
+    };
+    const { policy, entry } = enforceTeamSum(doctored);
+    expect(entry).toMatchObject({ check: "team_sum", statedPct: 96 });
+    const sum = policy.budgets.team_envelopes.reduce((s, t) => s + t.usd_month, 0);
+    const pct = sum / policy.budgets.company_envelope_usd_month;
+    expect(pct).toBeGreaterThanOrEqual(0.85);
+    expect(pct).toBeLessThanOrEqual(0.95);
   });
 });
 
