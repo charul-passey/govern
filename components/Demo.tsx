@@ -5,6 +5,7 @@ import { track } from "@vercel/analytics";
 import type { PolicyCore, Rationales } from "@/lib/policy-schema";
 import type { CompanyProfile } from "@/lib/profile";
 import { ProfileStep } from "@/components/demo/ProfileStep";
+import { StepRail } from "@/components/demo/StepRail";
 import { PolicyArtifact } from "@/components/demo/PolicyArtifact";
 import { Simulator } from "@/components/demo/Simulator";
 import { PRESET_POLICIES } from "@/components/demo/preset-policies";
@@ -124,6 +125,7 @@ export function Demo() {
   return (
     <section id="demo" className="bg-panel px-6 py-20 sm:py-24">
       <div className="mx-auto max-w-shell">
+        <StepRail hasPolicy={policy !== null} />
         <ProfileStep
           onPreset={selectPreset}
           onGenerate={customize}

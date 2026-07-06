@@ -16,8 +16,13 @@ Primary CTA: Generate a policy →
 Secondary link: Read the memo
 Build line (monospace): built in {N} days · one PM · working demo below
 
-## PROBLEM SECTION
+## PAGE ORDER (structural, locked)
+Hero → Demo (Steps 1-3) → The Gap → Instruments → Footer.
+The demo sits directly under the hero. The argument follows the product.
 
+## THE GAP SECTION (renders after the demo)
+
+Section label: THE GAP
 Stat cards (number, then caption, footnote marker as small superscript):
 
 13×
@@ -32,17 +37,13 @@ year-over-year growth in AI charges surfacing as employee reimbursements [3]
 54×
 gap between the median company and the top decile in monthly AI spend per employee [3]
 
-Body (five paragraphs, verbatim):
+Body (two paragraphs, verbatim):
 
-Every system a company uses to control spending makes the same three assumptions: a human decides to spend, at human speed, at a price agreed in advance. Payroll works this way. Vendor contracts work this way. The corporate card works this way, too. Swipe, policy check, approval.
+Every system a company uses to control spending makes the same three assumptions: a human decides to spend, at human speed, at a price agreed in advance. Token billing breaks all three at once. A prompt-template change can triple a bill overnight. An agent stuck in a retry loop can burn a quarter's budget before Monday standup. And on the invoice, a Friday-night experiment looks identical to production inference.
 
-Token billing breaks all three assumptions at once. Spend is initiated by software, at machine speed, at prices that float with usage. A prompt-template change can triple a bill overnight. An agent stuck in a retry loop can burn a quarter's budget before Monday standup. And on the invoice, a junior engineer's Friday-night experiment looks identical to production inference.
+The market's answer so far is visibility: dashboards that show where the tokens went. Visibility is necessary. It is also where every product on the market stops. A dashboard reports the fire. Policy decides which fires can't start. The most sophisticated control publicly deployed at scale is a flat monthly cap per employee,[4] and a cap rations spend, punishes the teams whose AI use is actually working, and governs nothing.
 
-Finance teams know it. AI charges are leaking onto personal cards and coming back as reimbursements, up 3× in a year.[3] The most sophisticated control publicly deployed at scale is a flat monthly cap per employee.[4] That is a seat-era instrument aimed at a usage-era problem. A cap rations spend, punishes the teams whose AI use is actually working, and governs nothing.
-
-The market's answer so far is visibility: dashboards that show where the tokens went. Visibility is necessary. It is also where every product on the market stops. A dashboard reports the fire. Policy decides which fires can't start. For people and for vendors, that policy layer took decades to build. For intelligence, it doesn't exist yet.
-
-What would it look like if it did? Generate one and find out. ↓
+Closing line (links to /memo): The full argument, with sources: read the memo →
 
 Chart (renders between stat cards and body, from data/ai-index.ts):
 Line chart, Jan 2023 to May 2026. Ink line: Ramp AI Index, ends 54.2%. Dashed gray line: U.S. Census BTOS estimate, ends 20.1%. Labels at line ends, monospace. No legend box, no gridlines heavier than 1px. Title (small caps or small semibold): Share of U.S. businesses paying for AI. Source line under chart: Ramp AI Index, ramp.com/data, May 2026.
@@ -93,6 +94,7 @@ Step 1 header: Pick a company
 Step 1 subhead: Choose a preset or set your own. Each one generates a full policy calibrated to published industry benchmarks.
 Preset badge (on preset-served policies): benchmark preset · regenerate live ↻
 Step 2 label: STEP 2 · POLICY
+Default demo state (locked behavior): No company is preselected; Step 1 is the first action. A slim top nav is always visible: the GOVERN wordmark left (scroll-to-top), Memo and Build log links right in small gray type; ground background, a subtle bottom border only once scrolled. A horizontal step rail renders inline above Step 1 — the three step labels in the step-label idiom — and docks beneath the nav when scrolled, releasing after Step 3 ends (sticky within the demo container). Steps whose content does not yet exist are muted and non-interactive; the current step highlights by scroll position; steps with content click-to-jump. On mobile the rail compresses to 1 · PROFILE, 2 · POLICY, 3 · ENFORCEMENT and both bars stay slim. Step 2 renders compact by default: meta.summary, the company envelope with its benchmark chip, then the seven policy section titles as collapsed rows. Expand control: Read the full policy ↓ · Collapse control: Collapse ↑. The affordance line stays visible in the compact state. Step 3 auto-plays its replay the first time it scrolls into view after generation, once per visit; any interaction pauses it; prefers-reduced-motion renders the completed state instead.
 Affordance line (under policy title, small type; line count computed from the rendered JSON, never hardcoded): also available as policy.json · {N} lines · schema-validated
 Company envelope chip: {N}× sector median
 Team envelope chip: {N}% of envelope

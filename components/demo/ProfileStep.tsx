@@ -68,7 +68,7 @@ export function ProfileStep({
   const [strictness, setStrictness] = useState<Strictness>("normal");
 
   return (
-    <div>
+    <div id="step-1" className="scroll-mt-24">
       <p className="font-mono text-xs uppercase tracking-wide text-ink/50">STEP 1 · PROFILE</p>
       <h2 className="mt-1 text-2xl font-bold tracking-tight text-ink">Pick a company</h2>
       <p className="mt-1 max-w-prose text-sm text-ink/60">

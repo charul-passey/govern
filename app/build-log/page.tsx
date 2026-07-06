@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { BUILD_DAYS } from "@/lib/constants";
 import { TrackOnMount } from "@/components/TrackOnMount";
@@ -40,15 +39,6 @@ export default function BuildLogPage() {
   return (
     <main className="mx-auto max-w-prose px-6 py-16">
       <TrackOnMount event="build_log_opened" />
-      <nav className="mb-12 print:hidden">
-        <Link
-          href="/"
-          className="rounded-sm font-mono text-sm text-ink/50 underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-        >
-          ← <span className="uppercase tracking-widest">Govern</span>
-        </Link>
-      </nav>
-
       <header>
         <h1 className="text-4xl font-extrabold tracking-tight text-ink">Build log</h1>
         <p className="mt-3 text-lg text-ink/60">

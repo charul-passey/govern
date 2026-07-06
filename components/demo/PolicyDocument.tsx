@@ -1,6 +1,18 @@
 import type { PolicyCore } from "@/lib/policy-schema";
 import { changedUnder } from "@/components/demo/diff";
 
+// The seven section titles, in render order. Kept in sync with the <Section> titles
+// below; the compact policy view lists these as collapsed rows.
+export const SECTION_TITLES = [
+  "Providers & models",
+  "Budgets & variance bands",
+  "Agent guardrails",
+  "Shadow-AI rules",
+  "Classification",
+  "Approvals",
+  "Anomaly response ladder",
+] as const;
+
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 const FLASH = " animate-value-flash rounded-sm px-0.5";
 

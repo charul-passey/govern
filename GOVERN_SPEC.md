@@ -30,7 +30,7 @@ The site succeeds if:
 
 ## 3. Site architecture (single page + two auxiliary routes)
 
-Route: `govern.charulpassey.com` (Vercel). Single scrolling page, sections below, plus `/memo` (printable strategy memo) and `/build-log`.
+Route: `govern.charulpassey.com` (Vercel). Single scrolling page, plus `/memo` and `/build-log`. PAGE ORDER (revised after fresh-eyes testing): Hero → Demo → The Gap (condensed argument) → Instruments → Footer. The demo sits directly under the hero; the argument follows the product.
 
 ### §0 Hero
 - White field, near-black type, single yellow accent. Large statement:

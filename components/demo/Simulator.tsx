@@ -39,6 +39,11 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
   const [instant, setInstant] = useState(false);
   const [preparing, setPreparing] = useState(false);
   const railRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const autoPlayedRef = useRef(false);
+  const pendingTriggerRef = useRef<"auto" | "manual">("manual");
+  const startRef = useRef<(trigger: "auto" | "manual") => void>(() => {});
+  const stateRef = useRef({ phase, preparing });
 
   const results = useMemo(() => {
     const p = policy as unknown as Policy;
@@ -100,19 +105,19 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
     setPreparing(false);
   }, [signature]);
 
-  function begin() {
+  function begin(trigger: "auto" | "manual") {
     setInstant(false);
     setShowTally(false);
     setRevealed(0);
     setPhase("playing");
-    track("replay_started");
+    track("replay_started", { trigger });
   }
 
   // Auto-start once rationales arrive after a preparing click.
   useEffect(() => {
     if (preparing && policy.rationales) {
       setPreparing(false);
-      begin();
+      begin(pendingTriggerRef.current);
     }
   }, [preparing, policy]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -126,6 +131,24 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
       track("replay_completed");
     }
   }, [phase, reduced, results.length]);
+
+  // Auto-play: the first time Step 3 scrolls into view with a policy present,
+  // start the replay once. Any manual start/skip flips autoPlayedRef and takes over.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        const s = stateRef.current;
+        if (entry.isIntersecting && !autoPlayedRef.current && s.phase === "idle" && !s.preparing) {
+          startRef.current("auto");
+        }
+      },
+      { threshold: 0.25 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   // Card reveals are driven by the clock: each event fires as it is crossed.
   const handleCross = useCallback(
@@ -150,15 +173,18 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
     return () => clearTimeout(t);
   }, [phase, showTally, instant, captureFirst]);
 
-  function start() {
+  function start(trigger: "auto" | "manual" = "manual") {
+    autoPlayedRef.current = true;
     if (!policy.rationales) {
+      pendingTriggerRef.current = trigger;
       setPreparing(true);
       return;
     }
-    begin();
+    begin(trigger);
   }
 
   function skip() {
+    autoPlayedRef.current = true;
     setInstant(true);
     setRevealed(results.length);
     setShowTally(true);
@@ -177,16 +203,19 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
     el.classList.add("animate-value-flash");
   }
 
+  startRef.current = start;
+  stateRef.current = { phase, preparing };
+
   const shown = results.slice(0, revealed);
 
   return (
-    <div className="mt-16 border-t border-ink/10 pt-10">
+    <div id="step-3" ref={rootRef} className="mt-16 scroll-mt-24 border-t border-ink/10 pt-10">
       <p className="font-mono text-xs uppercase tracking-wide text-ink/50">STEP 3 · ENFORCEMENT</p>
 
       {phase === "idle" && (
         <button
           type="button"
-          onClick={start}
+          onClick={() => start("manual")}
           disabled={preparing}
           className="mt-4 rounded-md bg-ink px-5 py-2.5 text-sm font-semibold text-ground focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-panel disabled:opacity-50"
         >
@@ -196,7 +225,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
 
       {phase !== "idle" && (
         <>
-          <div className="sticky top-0 z-10 -mx-6 mt-4 flex flex-wrap items-center gap-4 bg-panel px-6 py-2">
+          <div className="mt-4 flex flex-wrap items-center gap-4 py-2">
             {phase === "playing" ? (
               <button
                 type="button"
@@ -208,7 +237,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
             ) : (
               <button
                 type="button"
-                onClick={start}
+                onClick={() => start("manual")}
                 className="rounded-md bg-ink px-5 py-2 text-sm font-semibold text-ground focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-panel"
               >
                 Replay the week
@@ -267,7 +296,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
             <div
               id="sim-json"
               ref={railRef}
-              className="min-w-0 rounded-md border border-ink/10 bg-ground p-4 lg:sticky lg:top-16 lg:col-span-2 lg:max-h-screen lg:overflow-auto"
+              className="min-w-0 rounded-md border border-ink/10 bg-ground p-4 lg:sticky lg:top-24 lg:col-span-2 lg:max-h-screen lg:overflow-auto"
             >
               <PolicyJson policy={policy} changed={NONE} />
             </div>

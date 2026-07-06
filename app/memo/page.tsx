@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Fragment, type ReactNode } from "react";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { TrackOnMount } from "@/components/TrackOnMount";
 
@@ -129,15 +128,6 @@ export default function MemoPage() {
   return (
     <main className="memo mx-auto max-w-prose px-6 py-16">
       <TrackOnMount event="memo_opened" />
-      <nav className="mb-12 print:hidden">
-        <Link
-          href="/"
-          className="rounded-sm font-mono text-sm text-ink/50 underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-        >
-          ← <span className="uppercase tracking-widest">Govern</span>
-        </Link>
-      </nav>
-
       <article>{body}</article>
 
       <section className="mt-12 break-before-page">
