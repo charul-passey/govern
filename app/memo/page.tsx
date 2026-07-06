@@ -3,6 +3,7 @@ import path from "node:path";
 import { Fragment, type ReactNode } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { TrackOnMount } from "@/components/TrackOnMount";
 
 export const metadata: Metadata = {
   title: "The governance gap · Govern",
@@ -127,6 +128,7 @@ export default function MemoPage() {
 
   return (
     <main className="memo mx-auto max-w-prose px-6 py-16">
+      <TrackOnMount event="memo_opened" />
       <nav className="mb-12 print:hidden">
         <Link
           href="/"

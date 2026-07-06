@@ -3,6 +3,7 @@ import path from "node:path";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BUILD_DAYS } from "@/lib/constants";
+import { TrackOnMount } from "@/components/TrackOnMount";
 
 export const metadata: Metadata = {
   title: "Build log · Govern",
@@ -38,6 +39,7 @@ export default function BuildLogPage() {
 
   return (
     <main className="mx-auto max-w-prose px-6 py-16">
+      <TrackOnMount event="build_log_opened" />
       <nav className="mb-12 print:hidden">
         <Link
           href="/"

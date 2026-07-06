@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@vercel/analytics";
 import type { PolicyCore, Rationales } from "@/lib/policy-schema";
 import type { CompanyProfile } from "@/lib/profile";
 import { ProfileStep } from "@/components/demo/ProfileStep";
@@ -57,6 +58,10 @@ export function Demo() {
       setFallback(Boolean(d1.fallback));
       setGenId((n) => n + 1);
       setLoading(false);
+      track("policy_generated", {
+        source: d1.fallback ? "fallback" : "live",
+        strictness: profile.strictness,
+      });
 
       if (d1.rationalesPending) {
         const res2 = await fetch("/api/generate-policy", {
@@ -82,10 +87,12 @@ export function Demo() {
     setFallback(false);
     setError(false);
     setGenId((n) => n + 1);
+    track("policy_generated", { source: "preset", strictness: "normal" });
   }
 
   function changeStrictness(s: Strictness) {
     if (!origin) return;
+    track("strictness_toggled", { strictness: s });
     if (origin.kind === "preset") {
       // Swap the committed file instantly; the JSON diff still highlights changes.
       const f = PRESET_POLICIES[origin.company][s];

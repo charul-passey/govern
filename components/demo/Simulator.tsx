@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { track } from "@vercel/analytics";
 import type { Policy, PolicyCore, Rationales } from "@/lib/policy-schema";
 import { evaluate, computeTally } from "@/lib/engine";
 import { events } from "@/data/events";
@@ -104,6 +105,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
     setShowTally(false);
     setRevealed(0);
     setPhase("playing");
+    track("replay_started");
   }
 
   // Auto-start once rationales arrive after a preparing click.
@@ -121,6 +123,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
       setRevealed(results.length);
       setShowTally(true);
       setPhase("done");
+      track("replay_completed");
     }
   }, [phase, reduced, results.length]);
 
@@ -132,7 +135,10 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
     },
     [captureFirst],
   );
-  const handleComplete = useCallback(() => setPhase("done"), []);
+  const handleComplete = useCallback(() => {
+    setPhase("done");
+    track("replay_completed");
+  }, []);
 
   // After the last card, a brief pause, then the tally prepends and the stack flips down.
   useEffect(() => {
@@ -160,6 +166,7 @@ export function Simulator({ policy }: { policy: SimPolicy }) {
   }
 
   function handleClause(clause: string) {
+    track("clause_clicked");
     const rail = railRef.current;
     if (!rail) return;
     const el = rail.querySelector<HTMLElement>(`[data-json-path="${clauseToPath(clause)}"]`);

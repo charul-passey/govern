@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { track } from "@vercel/analytics";
 
 const fmt = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 
@@ -23,6 +24,15 @@ function Calculator() {
   const [frontierShare, setFrontierShare] = useState(10); // %
   const [frontierPrice, setFrontierPrice] = useState("15.00"); // $/Mtok
   const [efficientPrice, setEfficientPrice] = useState("0.80"); // $/Mtok
+  const used = useRef(false);
+
+  // Fire once, on the visitor's first interaction with any input.
+  function markUsed() {
+    if (!used.current) {
+      used.current = true;
+      track("calculator_used");
+    }
+  }
 
   const fp = num(frontierPrice);
   const ep = num(efficientPrice);
@@ -54,7 +64,10 @@ function Calculator() {
             max={2000}
             step={10}
             value={volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
+            onChange={(e) => {
+              markUsed();
+              setVolume(Number(e.target.value));
+            }}
             className="mt-2 w-full cursor-pointer accent-ink"
           />
         </div>
@@ -73,7 +86,10 @@ function Calculator() {
             max={100}
             step={1}
             value={frontierShare}
-            onChange={(e) => setFrontierShare(Number(e.target.value))}
+            onChange={(e) => {
+              markUsed();
+              setFrontierShare(Number(e.target.value));
+            }}
             className="mt-2 w-full cursor-pointer accent-ink"
           />
         </div>
@@ -91,7 +107,10 @@ function Calculator() {
               min={0}
               step={0.01}
               value={frontierPrice}
-              onChange={(e) => setFrontierPrice(e.target.value)}
+              onChange={(e) => {
+                markUsed();
+                setFrontierPrice(e.target.value);
+              }}
               className="w-full bg-transparent py-2 pl-1 text-sm text-ink focus:outline-none"
             />
           </div>
@@ -110,7 +129,10 @@ function Calculator() {
               min={0}
               step={0.01}
               value={efficientPrice}
-              onChange={(e) => setEfficientPrice(e.target.value)}
+              onChange={(e) => {
+                markUsed();
+                setEfficientPrice(e.target.value);
+              }}
               className="w-full bg-transparent py-2 pl-1 text-sm text-ink focus:outline-none"
             />
           </div>
