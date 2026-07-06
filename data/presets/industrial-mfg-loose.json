@@ -10,7 +10,7 @@
     "meta": {
       "company_name": "Industrial mfg",
       "strictness": "loose",
-      "summary": "Manufacturing company AI policy with envelopes set at 0.3x sector median, prioritizing efficient routing and shadow AI consolidation."
+      "summary": "AI spend envelopes set at 0.5x sector median, calibrated for an experimenting manufacturing company with loose controls and approval gates on fine-tunes and new providers."
     },
     "providers": {
       "allowlist": [
@@ -30,9 +30,9 @@
           "data_terms_reviewed": true
         },
         {
-          "name": "AWS Bedrock",
+          "name": "Cohere",
           "tier": "secondary",
-          "data_terms_reviewed": true
+          "data_terms_reviewed": false
         }
       ],
       "new_provider_rule": {
@@ -50,35 +50,35 @@
       }
     },
     "budgets": {
-      "company_envelope_usd_month": 2900,
+      "company_envelope_usd_month": 4600,
       "team_envelopes": [
         {
           "team": "Engineering",
-          "usd_month": 1100,
+          "usd_month": 1903,
           "variance_band_pct": 60,
           "unit_cost_metric": "cost per merged PR"
         },
         {
+          "team": "Operations",
+          "usd_month": 1110,
+          "variance_band_pct": 65,
+          "unit_cost_metric": "cost per automated work order"
+        },
+        {
           "team": "Data",
-          "usd_month": 700,
-          "variance_band_pct": 55,
+          "usd_month": 714,
+          "variance_band_pct": 60,
           "unit_cost_metric": "cost per pipeline run"
         },
         {
-          "team": "ML Platform",
-          "usd_month": 500,
-          "variance_band_pct": 65,
-          "unit_cost_metric": "cost per model deployment"
-        },
-        {
-          "team": "Operations",
-          "usd_month": 300,
-          "variance_band_pct": 60,
+          "team": "Support",
+          "usd_month": 397,
+          "variance_band_pct": 55,
           "unit_cost_metric": "cost per resolved ticket"
         },
         {
           "team": "GTM",
-          "usd_month": 200,
+          "usd_month": 238,
           "variance_band_pct": 55,
           "unit_cost_metric": "cost per qualified lead"
         }
@@ -86,7 +86,7 @@
       "burn_alert_pct": 90,
       "benchmark": {
         "sector_median_per_employee_usd": 7.69,
-        "envelope_multiple_of_median": 0.3,
+        "envelope_multiple_of_median": 0.5,
         "source": "Ramp AI Index, ramp.com/data, May 2026"
       }
     },
@@ -98,24 +98,24 @@
         "enabled": true,
         "single_txn_ceiling_usd": 750,
         "merchant_scopes": [
-          "data-licensing",
-          "api-inference",
+          "inference-api",
+          "dataset-license",
           "model-hosting",
-          "research-databases"
+          "developer-tools"
         ]
       }
     },
     "shadow_ai": {
       "employee_card_ai_merchants": "flag",
       "team_subscription_threshold": 5,
-      "reimbursement_rule": "Employee-card AI purchases below $50/month are flagged for consolidation review within 30 days; purchases at or above $50/month require prior approval from the team lead before reimbursement."
+      "reimbursement_rule": "AI tool purchases on personal or employee cards are reimbursable up to $50/month per employee only if no approved equivalent exists on the allowlist and the employee submits a vendor justification within 30 days of purchase."
     },
     "classification": {
       "default_class": "OpEx",
       "rules": [
         {
           "match": "project_tag",
-          "value": "customer-facing-product",
+          "value": "customer-facing",
           "class": "COGS"
         },
         {
@@ -125,7 +125,7 @@
         },
         {
           "match": "project_tag",
-          "value": "internal-tooling",
+          "value": "internal-tool",
           "class": "OpEx"
         }
       ]
@@ -139,39 +139,39 @@
     "response_ladder": [
       {
         "step": 1,
-        "trigger": "Team envelope burn reaches 90% before month end",
+        "trigger": "Team envelope burn exceeds 90% before month end or single-hour spend exceeds 2x hourly run rate",
         "action": "alert",
-        "window_hours": 24,
+        "window_hours": 4,
         "owner": "Team lead"
       },
       {
         "step": 2,
-        "trigger": "Team envelope burn exceeds 110% of monthly allocation",
+        "trigger": "Team envelope burn exceeds 110% of monthly allocation or unattributed spend exceeds $500 in 24 hours",
         "action": "throttle",
-        "window_hours": 48,
+        "window_hours": 24,
         "owner": "Engineering lead"
       },
       {
         "step": 3,
-        "trigger": "Company envelope burn exceeds 125% of monthly allocation",
+        "trigger": "Company envelope burn exceeds 100% before month end or agent kill threshold breached and loop not terminated",
         "action": "block",
-        "window_hours": 72,
+        "window_hours": 1,
         "owner": "CFO"
       }
     ],
     "rationales": {
-      "e1": "Production support-triage inference at $211/day runs on an allowlisted primary provider under an active production environment tag, classifying correctly as COGS with no policy breach.",
-      "e2": "Nightly embeddings at $38 fall well within the Data team envelope of $700/month and use an allowlisted provider, so this charge passes without action.",
-      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 65% variance band; the most likely cause is a model version upgrade or prompt expansion in the deploy, and the team lead is alerted to investigate.",
-      "e4": "Subscription 3 for Marketing against a 5 subscription threshold. Rerouted to the central contract.",
+      "e1": "Support team production inference at $211/day runs within the $2,500 Support envelope and is correctly classified as COGS under the production environment rule; no action required.",
+      "e2": "Data team nightly embeddings at $38 falls well within the $4,500 Data envelope and is routine OpEx; logged and passed.",
+      "e3": "Search team cost per request spiked 96% overnight with flat volume, breaching the 60% variance band on the Engineering envelope; likely a prompt-length regression or model routing misconfiguration introduced in the deploy.",
+      "e4": "Subscription 3 for Marketing against a 5 subscription threshold. Approved.",
       "e5": "Fine-tune estimate 4800 against the 15000 approval line. Approved.",
-      "e6": "340 retries at 47 per hour, over the 50 retry limit. About 1090 in overnight burn prevented. Blocked, owner paged.",
-      "e7": "The Growth team frontier-model exception for the demo build is self-serve eligible under the 168-hour window and the requested cost delta falls within the $1,200 max_delta_usd cap, so the exception is approved.",
-      "e8": "A junior engineer personal API key running at 22x baseline with no project tag triggers step 2 throttle; experimentation is preserved at baseline rate pending tag assignment and team lead acknowledgment within 48 hours.",
-      "e9": "The procurement agent's $499 dataset license purchase falls within the $750 single-transaction ceiling and the data-licensing merchant scope, so the agent card transaction is approved.",
-      "e10": "The Design team's $89/month AI video trial overlaps with Sales' existing $1,400/year contract at 40% seat utilization; consolidating onto the existing contract recovers $840 in annualized unused seat value and the trial is rerouted.",
-      "e11": "Unrecognized provider under a allow_with_review new-provider rule. Approved.",
-      "e12": "Inference tagged to internal-tooling was misclassified as COGS; the internal-tooling project tag rule reclassifies this charge to OpEx effective the current billing period.",
+      "e6": "The research agent reached 340 calls per hour, exceeding the 50-retry-per-task limit, and its $47/hr burn rate with growing context would have consumed an estimated $1,090 before natural termination; the loop is blocked and the task is queued for manual restart.",
+      "e7": "Growth team frontier-model exception for the demo build is self-serve eligible under the 168-hour window with a delta cap of $1,200; the request is approved provided incremental cost stays within that cap.",
+      "e8": "A junior engineer personal API key is running at 22x baseline with no project tag; ladder step 2 throttle applied by Engineering lead within 24 hours until the spend is attributed to a valid team envelope.",
+      "e9": "The procurement agent purchased a $499 dataset license, which is within the $750 single-transaction ceiling and falls under the dataset-license merchant scope on the agent card; transaction approved.",
+      "e10": "The Design team AI video trial at $89/month overlaps with the Sales team tool at $1,400/year running at 40% seat utilization; consolidating to the existing contract recovers $840 in annualized unused seat value.",
+      "e11": "Unrecognized provider charged 120; the new-provider rule is set to allow_with_review. Approved.",
+      "e12": "Inference tagged internal-tool was submitted as COGS; the classification rule for project_tag internal-tool overrides to OpEx and the transaction is reclassified.",
       "e13": "Company spend at 87% of envelope against a 90% burn alert, 9 days left. Approved.",
       "e14": "Weekly rollup. Week closed."
     }

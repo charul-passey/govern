@@ -10,7 +10,7 @@
     "meta": {
       "company_name": "Series C SaaS",
       "strictness": "normal",
-      "summary": "AI spend governed at 2.0x sector median with team envelopes, a 25-retry agent kill switch, and rerouting of shadow subscriptions to approved contracts."
+      "summary": "AI spend envelopes set at 2.0x sector median for a scaling software company with normal controls across routing, agents, and shadow AI."
     },
     "providers": {
       "allowlist": [
@@ -33,11 +33,6 @@
           "name": "Cohere",
           "tier": "secondary",
           "data_terms_reviewed": true
-        },
-        {
-          "name": "Mistral",
-          "tier": "secondary",
-          "data_terms_reviewed": false
         }
       ],
       "new_provider_rule": {
@@ -59,7 +54,7 @@
       "team_envelopes": [
         {
           "team": "Engineering",
-          "usd_month": 18000,
+          "usd_month": 16000,
           "variance_band_pct": 35,
           "unit_cost_metric": "cost per merged PR"
         },
@@ -73,19 +68,19 @@
           "team": "Product",
           "usd_month": 5000,
           "variance_band_pct": 35,
-          "unit_cost_metric": "cost per shipped design"
+          "unit_cost_metric": "cost per shipped spec"
+        },
+        {
+          "team": "Support",
+          "usd_month": 5000,
+          "variance_band_pct": 30,
+          "unit_cost_metric": "cost per resolved ticket"
         },
         {
           "team": "GTM",
           "usd_month": 4000,
           "variance_band_pct": 40,
           "unit_cost_metric": "cost per qualified lead"
-        },
-        {
-          "team": "Support",
-          "usd_month": 3000,
-          "variance_band_pct": 30,
-          "unit_cost_metric": "cost per resolved ticket"
         }
       ],
       "burn_alert_pct": 82,
@@ -101,25 +96,25 @@
       "kill_threshold_usd_per_hour": 40,
       "agent_card": {
         "enabled": true,
-        "single_txn_ceiling_usd": 750,
+        "single_txn_ceiling_usd": 600,
         "merchant_scopes": [
-          "inference-api",
-          "dataset-license",
-          "model-registry"
+          "data-licensing",
+          "api-inference",
+          "developer-tools"
         ]
       }
     },
     "shadow_ai": {
       "employee_card_ai_merchants": "reroute",
       "team_subscription_threshold": 2,
-      "reimbursement_rule": "AI tool purchases on personal or employee cards are not reimbursable if an approved equivalent exists in the allowlist or if the team has already reached its subscription threshold."
+      "reimbursement_rule": "AI tool purchases on personal or employee cards are not reimbursable if an approved equivalent exists on the company allowlist or a team subscription covers the same capability."
     },
     "classification": {
       "default_class": "OpEx",
       "rules": [
         {
           "match": "project_tag",
-          "value": "customer-facing",
+          "value": "customer-facing-inference",
           "class": "COGS"
         },
         {
@@ -129,7 +124,7 @@
         },
         {
           "match": "project_tag",
-          "value": "internal-tool",
+          "value": "internal-tooling",
           "class": "OpEx"
         },
         {
@@ -148,41 +143,41 @@
     "response_ladder": [
       {
         "step": 1,
-        "trigger": "Team envelope burn exceeds 82% before day 25 of month",
+        "trigger": "Team envelope burn exceeds 82% before month end or single-hour spend exceeds 2x rolling hourly average",
         "action": "alert",
-        "window_hours": 24,
+        "window_hours": 4,
         "owner": "Team lead"
       },
       {
         "step": 2,
-        "trigger": "Team envelope burn exceeds 100% or company envelope exceeds 95%",
+        "trigger": "Team envelope burn exceeds 100% or unattributed spend exceeds $500 in a rolling 24-hour window",
         "action": "throttle",
-        "window_hours": 12,
+        "window_hours": 24,
         "owner": "Engineering lead"
       },
       {
         "step": 3,
-        "trigger": "Company envelope burn exceeds 110% or unattributed spend exceeds $2,000 in 24 hours",
+        "trigger": "Company envelope burn exceeds 110% or agent kill threshold breached and loop not terminated within 1 hour of alert",
         "action": "block",
-        "window_hours": 4,
-        "owner": "Controller"
+        "window_hours": 8,
+        "owner": "CFO"
       }
     ],
     "rationales": {
-      "e1": "Production inference for the support-triage service at $211/day runs under the Engineering envelope and carries a customer-facing project tag, correctly classified as COGS under the production environment rule.",
-      "e2": "Nightly embeddings at $38 fall within the Data team envelope of $8,000/month and are tagged to an internal pipeline, correctly classified as OpEx with no action required.",
-      "e3": "Search team cost per request rose 96% overnight against unchanged volume, breaching the 35% variance band; the most likely cause is a model routing regression or prompt-length expansion introduced in the deploy, requiring team lead review.",
-      "e4": "Marketing has now logged three ChatGPT Team subscriptions this quarter, exceeding the team_subscription_threshold of 2; this charge is rerouted to the approved OpenAI enterprise contract and the employee card purchase is blocked.",
-      "e5": "The $4,800 fine-tune request from ML Platform exceeds the $4,000 fine_tune_over_usd threshold and requires Engineering lead approval before the job is queued.",
-      "e6": "The Growth team research agent reached 340 calls per hour, exceeding the 25-retry limit and the $40/hour kill threshold; the agent was terminated, preventing an estimated $1,090 in uncontrolled burn.",
-      "e7": "Growth team frontier exception for the demo build falls within the 72-hour window and the $250 max_delta_usd cap; Engineering lead approval is required and the request is within policy bounds.",
-      "e8": "A junior engineer personal API key running at 22x baseline with no project tag triggers ladder step 2 throttle; spend is paused pending attribution, preserving the ability to resume once the project tag is applied.",
-      "e9": "The procurement agent's $499 dataset license purchase falls within the agent card single_txn_ceiling_usd of $750 and the dataset-license merchant scope; the transaction is approved.",
-      "e10": "The Design team's $89/month AI video trial duplicates a Sales-held tool at $1,400/year running at 40% seat utilization; consolidating onto the existing contract recovers $840 in annualized unused seat value.",
-      "e11": "A $120 charge from an unrecognized inference provider in Engineering triggers the new_provider_rule; the charge is held pending Engineering lead approval and completion of the provider security questionnaire.",
-      "e12": "Inference tagged internal-tool was submitted as COGS; the internal-tool project tag rule overrides the environment signal and reclassifies the spend as OpEx.",
-      "e13": "Month-to-date spend has reached 87% of the company envelope with 9 days remaining, crossing the 82% burn_alert_pct threshold; the Controller and team leads are notified to pace remaining spend against the $6,200 balance.",
-      "e14": "Weekly rollup complete; all team envelopes reconciled, no unresolved classification exceptions, and agent card transactions balanced against approved merchant scopes."
+      "e1": "Support team production inference at $211/day runs within the $5,000 monthly Support envelope and is correctly classified as COGS under the production environment rule; no action required.",
+      "e2": "Data team nightly embeddings at $38 falls well within the $8,000 monthly Data envelope and carries a valid project tag; routine pass with no flags.",
+      "e3": "Search team cost per request rose 96% overnight with flat volume, breaching the 35% variance band on the Engineering envelope; Engineering lead notified to review the deploy for model routing regression or prompt bloat.",
+      "e4": "Marketing has three ChatGPT Team subscriptions this quarter, exceeding the team_subscription_threshold of 2; the third charge is rerouted to the approved OpenAI company account and the employee card transaction is blocked per shadow AI policy.",
+      "e5": "The $4,800 fine-tune request from ML Platform exceeds the $4,000 fine_tune_over_usd threshold and requires Engineering lead approval before the job is submitted.",
+      "e6": "The Growth team research agent reached 340 retries per hour against the 25-retry limit and $47/hr against the $40/hr kill threshold; the loop is terminated immediately, preventing an estimated $1,090 in uncontrolled burn.",
+      "e7": "Growth team frontier-model exception for the demo build is within the 72-hour window and the incremental cost delta is below the $250 max_delta_usd cap; Engineering lead approval routes this to the frontier tier for the approved window.",
+      "e8": "An unattributed personal API key at 22x baseline triggers ladder step 2 throttle; Engineering lead has 24 hours to assign a valid project tag or spend is blocked, preserving the experimentation carve-out for attributed work.",
+      "e9": "The procurement agent's $499 dataset license purchase falls within the $600 single_txn_ceiling_usd and the data-licensing merchant scope on the agent card; transaction approved.",
+      "e10": "The Design team AI video trial at $89/month duplicates a capability already covered by Sales' $1,400/year contract at 40% seat utilization; consolidating onto the existing contract recovers $840 in annualized unused seat value and the trial is rerouted.",
+      "e11": "The $120 charge from an unrecognized inference provider in Engineering triggers the require_approval new_provider_rule; Engineering lead must complete the vendor security questionnaire before further charges are processed.",
+      "e12": "Inference tagged to internal-tooling is classified as OpEx under the internal-tooling project_tag rule; the COGS classification is corrected and the tagging team is notified to apply the correct tag at submission.",
+      "e13": "Month-to-date spend at 87% of the company envelope with 9 days remaining has crossed the 82% burn_alert_pct threshold; the alert issued at step 1 is active and team leads are pacing remaining spend against daily run rates.",
+      "e14": "Weekly rollup complete; all team envelopes within approved bands, one open approval pending for e5, and shadow AI reroutes processed; no escalation required."
     }
   }
 }

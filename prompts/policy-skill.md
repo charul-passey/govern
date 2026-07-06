@@ -137,7 +137,11 @@ Sector medians, USD per employee per month (Ramp AI Index, May 2026):
 Size medians (context, note the inversion): Small 21.33 · Medium 7.94 · Large 2.30.
 Financing: VC-backed 69.67 · PE-backed 7.60 · Other 7.27.
 Distribution context: overall median 11.38, top-decile median 610.61, top-1% 7,448.85.
-maturity_multiplier: experimenting 0.5x · scaling 2x · dependent 6-10x. The wide
+maturity_multiplier: experimenting 0.5x · scaling 2x · dependent 6-10x. The
+maturity_multiplier applies identically at every strictness level: strictness changes
+the controls around spend (thresholds, windows, approvals), never the size of the
+envelope. In rationales, attribute each event to the team envelope named in the event
+itself (e1 is Support, e2 is Data, e3 is the Search team under Engineering). The wide
 dependent multiplier is justified by the observed 54x median-to-top-decile spread;
 a policy must fund the winners, then govern the variance around them.
 Round envelopes to two significant figures. Sanity floor 300/month, ceiling 2M/month.
