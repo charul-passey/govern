@@ -83,7 +83,7 @@ About line: Govern is a concept project by Charul Passey, a payments and pricing
 Links: Read the memo · Build log · Resume (PDF) · LinkedIn · charulpassey.com
 
 ## DISCLAIMER (footer only, not floating mid-page)
-An independent concept project. Not affiliated with Ramp. Data cited from the public sources listed above.
+An independent concept project. Not affiliated with Ramp. Data cited from the public sources only.
 
 ## DEMO MICROCOPY (LOCKED — render verbatim)
 Step 1 label: STEP 1 · PROFILE

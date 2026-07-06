@@ -4,7 +4,7 @@ export function Footer() {
       <div className="mx-auto max-w-shell">
         <p className="max-w-prose text-xs text-ink/50">
           An independent concept project. Not affiliated with Ramp. Data cited
-          from the public sources listed above.
+          from the public sources only.
         </p>
       </div>
     </footer>
