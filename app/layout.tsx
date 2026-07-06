@@ -14,10 +14,27 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const HERO_HEADLINE =
+  "Every company just hired a third workforce. Nobody’s managing its budget.";
+const HERO_DESCRIPTION =
+  "Govern is a working concept for chapter two: policy, budget instruments, and enforcement for intelligence.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://govern-charul-passeys-projects.vercel.app"),
   title: "Govern",
-  description:
-    "A working concept for chapter two of AI spend management: policy, budgets, and enforcement for intelligence bought by the token.",
+  description: HERO_DESCRIPTION,
+  openGraph: {
+    title: HERO_HEADLINE,
+    description: HERO_DESCRIPTION,
+    url: "/",
+    siteName: "Govern",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HERO_HEADLINE,
+    description: HERO_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
