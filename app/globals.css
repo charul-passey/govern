@@ -20,3 +20,32 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Print: the memo exports as a clean black-on-white document. */
+@page {
+  margin: 1.6cm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+  .memo,
+  .memo * {
+    color: #000 !important;
+  }
+  .memo a {
+    text-decoration: none;
+  }
+  /* No stranded headings; keep list items and headings whole across pages. */
+  .memo h1,
+  .memo h2 {
+    break-after: avoid-page;
+  }
+  .memo h1,
+  .memo h2,
+  .memo li {
+    break-inside: avoid;
+  }
+}
