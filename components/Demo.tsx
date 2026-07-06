@@ -34,11 +34,13 @@ export function Demo() {
   const [strictness, setStrictness] = useState<Strictness>("normal");
   const [loading, setLoading] = useState(false);
   const [fallback, setFallback] = useState(false);
+  const [error, setError] = useState(false);
   const [genId, setGenId] = useState(0);
 
   // Live, two-phase: render the policy first, attach rationales in the background.
   async function liveGenerate(profile: CompanyProfile) {
     setLoading(true);
+    setError(false);
     setFallback(false);
     const current = policy;
     try {
@@ -66,6 +68,7 @@ export function Demo() {
       }
     } catch {
       setLoading(false);
+      setError(true);
     }
   }
 
@@ -76,6 +79,7 @@ export function Demo() {
     setOrigin({ kind: "preset", company });
     setStrictness("normal");
     setFallback(false);
+    setError(false);
     setGenId((n) => n + 1);
   }
 
@@ -87,6 +91,7 @@ export function Demo() {
       setPrevPolicy(policy);
       setPolicy(f.policy);
       setStrictness(s);
+      setError(false);
       setGenId((n) => n + 1);
     } else {
       void liveGenerate({ ...origin.profile, strictness: s });
@@ -118,6 +123,7 @@ export function Demo() {
           strictness={strictness}
           loading={loading}
           fallback={fallback}
+          error={error}
           genId={genId}
           presetServed={origin?.kind === "preset"}
           onStrictness={changeStrictness}

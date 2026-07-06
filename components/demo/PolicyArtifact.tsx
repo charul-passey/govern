@@ -13,6 +13,7 @@ export function PolicyArtifact({
   strictness,
   loading,
   fallback,
+  error,
   genId,
   presetServed,
   onStrictness,
@@ -23,6 +24,7 @@ export function PolicyArtifact({
   strictness: Strictness;
   loading: boolean;
   fallback: boolean;
+  error: boolean;
   genId: number;
   presetServed: boolean;
   onStrictness: (s: Strictness) => void;
@@ -31,7 +33,7 @@ export function PolicyArtifact({
   const [tab, setTab] = useState<"doc" | "json">("doc");
 
   // Step 2 appears once there is something to show.
-  if (!policy && !loading) return null;
+  if (!policy && !loading && !error) return null;
 
   return (
     <div className="mt-10">
@@ -81,8 +83,17 @@ export function PolicyArtifact({
         </div>
       )}
 
+      {!policy && !loading && error && (
+        <div className="mt-4 flex items-center justify-center rounded-md border border-ink/10 bg-ground py-16 text-sm text-ink/60">
+          Generation failed. Try again.
+        </div>
+      )}
+
       {policy && (
         <div className="relative mt-4">
+          {error && !loading && (
+            <p className="mb-3 text-sm text-ink/60">Generation failed. Try again.</p>
+          )}
           <div className="mb-3 flex gap-1 sm:hidden" role="tablist">
             {(["doc", "json"] as const).map((t) => (
               <button
