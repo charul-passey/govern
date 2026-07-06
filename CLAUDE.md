@@ -38,6 +38,7 @@ instruction conflict, stop and ask. Never invent scope beyond the spec.
 - Yellow is scarce: primary CTA, one stat highlight, the tally strip. Nothing else.
 - Type: Inter for UI and prose (tight tracking, weights 500-800 for display);
   JetBrains Mono for JSON, clause IDs, counters
+- Wordmark renders as GOVERN, uppercase, tracked; the name in prose is Govern.
 - Layout: 1120px max shell, 720px prose measure, generous whitespace
 - Motion: simulator cards slide-fade in at 150ms. Nothing else animates. No parallax,
   no gradients, no glassmorphism, no shadows heavier than sm.

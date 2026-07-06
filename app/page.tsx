@@ -11,7 +11,7 @@ export default function Home() {
         <div className="mx-auto max-w-shell">
           <a
             href="#top"
-            className="rounded-sm text-base font-semibold text-ink no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="rounded-sm text-base font-semibold uppercase tracking-widest text-ink no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             Govern
           </a>

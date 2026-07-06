@@ -134,7 +134,7 @@ export default function MemoPage() {
           href="/"
           className="rounded-sm font-mono text-sm text-ink/50 underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink"
         >
-          ← Govern
+          ← <span className="uppercase tracking-widest">Govern</span>
         </Link>
       </nav>
 
