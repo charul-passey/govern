@@ -42,9 +42,12 @@ export function Hero() {
             </Link>
           </div>
 
-          <p className="mt-8 font-mono text-sm text-ink/60">
+          <Link
+            href="/build-log"
+            className="mt-8 inline-block rounded-sm font-mono text-sm text-ink/60 no-underline underline-offset-4 hover:text-ink hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-ground"
+          >
             built in {days} {dayLabel} · one PM · working demo below
-          </p>
+          </Link>
         </div>
       </div>
     </section>

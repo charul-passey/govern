@@ -79,11 +79,13 @@ Closing beat: use the locked closing paragraph from GOVERN_SPEC.md §3 verbatim 
 
 ## FOOTER (LOCKED — render verbatim)
 
-About line: Govern is a concept project by Charul Passey, a payments and pricing product manager. It was built in {N} days with Claude Code. The build log has the receipts.
-Links: Read the memo · Build log · Resume (PDF) · LinkedIn · charulpassey.com
+Minimal and subtle. No about line. One quiet row:
+Links: LinkedIn · GitHub · charulpassey.com
+Disclaimer (small type, below links, unchanged): An independent concept project. Not affiliated with Ramp. Data cited from public sources only.
+Note: /memo and /build-log remain reachable from the hero ("Read the memo") and body links; the resume, if included, lives on the person, not the product.
 
 ## DISCLAIMER (footer only, not floating mid-page)
-An independent concept project. Not affiliated with Ramp. Data cited from the public sources only.
+An independent concept project. Not affiliated with Ramp. Data cited from public sources only.
 
 ## DEMO MICROCOPY (LOCKED — render verbatim)
 Step 1 label: STEP 1 · PROFILE
