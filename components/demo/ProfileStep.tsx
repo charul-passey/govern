@@ -102,22 +102,25 @@ export function ProfileStep({
           <Dial label="Sector" options={SECTORS} value={sector} onChange={setSector} />
           <Dial label="AI maturity" options={MATURITIES} value={maturity} onChange={setMaturity} />
           <Dial label="Risk posture" options={STRICTNESSES} value={strictness} onChange={setStrictness} />
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() =>
-              onGenerate({
-                company_name: "Custom company",
-                headcount_band: headcount,
-                sector,
-                ai_maturity: maturity,
-                strictness,
-              })
-            }
-            className="rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-panel disabled:opacity-50"
-          >
-            Generate policy
-          </button>
+          <div>
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() =>
+                onGenerate({
+                  company_name: "Custom company",
+                  headcount_band: headcount,
+                  sector,
+                  ai_maturity: maturity,
+                  strictness,
+                })
+              }
+              className="rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-panel disabled:opacity-50"
+            >
+              Generate policy
+            </button>
+            <p className="mt-2 text-xs text-ink/40">generated and validated live · about 15 seconds</p>
+          </div>
         </div>
       )}
     </div>

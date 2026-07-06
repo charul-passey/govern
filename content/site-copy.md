@@ -68,6 +68,7 @@ Company envelope chip: {N}× sector median
 Team envelope chip: {N}% of envelope
 Fallback note: using cached policy
 Live progress stages, in order: Pulling sector benchmarks · Calibrating envelopes · Writing enforcement clauses · Validating against the engine
+Live generation expectation (small type beside or under the Customize generate button): generated and validated live · about 15 seconds
 Step 3 label: STEP 3 · ENFORCEMENT
 Step 3 button: Replay the week
 Skip control: Skip to summary
