@@ -5,6 +5,7 @@ import type { PolicyCore, Rationales } from "@/lib/policy-schema";
 import type { CompanyProfile } from "@/lib/profile";
 import { ProfileStep } from "@/components/demo/ProfileStep";
 import { PolicyArtifact } from "@/components/demo/PolicyArtifact";
+import { Simulator } from "@/components/demo/Simulator";
 import { PRESET_POLICIES } from "@/components/demo/preset-policies";
 import type { Strictness } from "@/components/demo/presets";
 
@@ -129,6 +130,7 @@ export function Demo() {
           onStrictness={changeStrictness}
           onRegenerate={regenerateLive}
         />
+        {policy && <Simulator policy={policy} />}
       </div>
     </section>
   );

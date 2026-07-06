@@ -64,12 +64,16 @@ Step 1 header: Pick a company
 Step 1 subhead: Choose a preset or set your own. Each one generates a full policy calibrated to published industry benchmarks.
 Preset badge (on preset-served policies): benchmark preset · regenerate live ↻
 Step 2 label: STEP 2 · POLICY
+Affordance line (under policy title, small type; line count computed from the rendered JSON, never hardcoded): also available as policy.json · {N} lines · schema-validated
 Company envelope chip: {N}× sector median
 Team envelope chip: {N}% of envelope
 Fallback note: using cached policy
 Live progress stages, in order: Pulling sector benchmarks · Calibrating envelopes · Writing enforcement clauses · Validating against the engine
 Live generation expectation (small type beside or under the Customize generate button): generated and validated live · about 15 seconds
 Step 3 label: STEP 3 · ENFORCEMENT
+Burn chart ghost annotation (at e6 block, small type on dotted projection): +$1,090 by 06:00 without policy
+Burn chart caption (small type, top left of chart): Cumulative AI spend · simulated week
+Burn chart end label (monospace, at line terminus, value summed from event contributions, never hardcoded): week total ${N}
 Step 3 button: Replay the week
 Skip control: Skip to summary
 New microcopy for any state not listed here must be proposed before rendering.

@@ -57,6 +57,10 @@ export interface Event {
   daysRemaining?: number;
   projectedOvernightUsd?: number;
 
+  // Plausible contribution to cumulative weekly AI spend, for the burn timeline.
+  // Not read by the engine.
+  spendContributionUsd?: number;
+
   // Test fixture, asserted against engine output.
   expectedVerdict: Verdict;
   expectedClauses: string[];
@@ -71,6 +75,7 @@ export const events: Event[] = [
       "Production inference, support-triage service, Claude Sonnet, $211 daily run rate",
     team: "Support",
     dailyRunRateUsd: 211,
+    spendContributionUsd: 800,
     expectedVerdict: "approved",
     expectedClauses: [
       "providers.allowlist",
@@ -85,6 +90,7 @@ export const events: Event[] = [
     description: "Nightly embeddings job, Data team, $38",
     team: "Data",
     amountUsd: 38,
+    spendContributionUsd: 180,
     expectedVerdict: "approved",
     expectedClauses: ["providers.allowlist", "budgets.team_envelope(Data)"],
   },
@@ -96,6 +102,7 @@ export const events: Event[] = [
       "Search team cost per request +96% overnight after deploy; volume unchanged",
     team: "Search",
     variancePct: 96,
+    spendContributionUsd: 760,
     expectedVerdict: "flagged_variance",
     expectedClauses: ["budgets.variance_band", "response_ladder.step1"],
   },
@@ -108,6 +115,7 @@ export const events: Event[] = [
     team: "Marketing",
     amountUsdMonth: 30,
     teamSubscriptionCount: 3,
+    spendContributionUsd: 210,
     expectedVerdict: "rerouted_shadow",
     expectedClauses: [
       "shadow_ai.employee_card_ai_merchants",
@@ -121,6 +129,7 @@ export const events: Event[] = [
     description: "Fine-tune job request, ML Platform team, estimated $4,800",
     team: "ML Platform",
     estimatedUsd: 4800,
+    spendContributionUsd: 660,
     expectedVerdict: "approval_recommended",
     expectedClauses: ["approvals.fine_tune_over_usd"],
   },
@@ -134,6 +143,7 @@ export const events: Event[] = [
     retries: 340,
     usdPerHour: 47,
     projectedOvernightUsd: 1090,
+    spendContributionUsd: 620,
     expectedVerdict: "blocked",
     expectedClauses: [
       "agents.max_retries_per_task",
@@ -147,6 +157,7 @@ export const events: Event[] = [
     description: "Growth team requests frontier-model exception for a demo build",
     team: "Growth",
     deltaUsd: 65,
+    spendContributionUsd: 560,
     expectedVerdict: "approved",
     expectedClauses: ["routing.frontier_exception"],
   },
@@ -157,6 +168,7 @@ export const events: Event[] = [
     description:
       "Junior engineer personal API key at 22x baseline, unattributed project tag",
     baselineMultiple: 22,
+    spendContributionUsd: 940,
     expectedVerdict: "throttled",
     expectedClauses: ["response_ladder.step2"],
   },
@@ -168,6 +180,7 @@ export const events: Event[] = [
       "Procurement agent purchases $499 dataset license via its agent card",
     team: "Procurement",
     amountUsd: 499,
+    spendContributionUsd: 1500,
     expectedVerdict: "approved",
     expectedClauses: [
       "agents.agent_card.merchant_scopes",
@@ -185,6 +198,7 @@ export const events: Event[] = [
     competingUsdYear: 1400,
     utilizationPct: 40,
     projectedSavingsUsdYear: 840,
+    spendContributionUsd: 560,
     expectedVerdict: "flagged_consolidation",
     expectedClauses: ["shadow_ai (category overlap application)"],
   },
@@ -195,6 +209,7 @@ export const events: Event[] = [
     description: "First charge from unrecognized inference provider, $120, Engineering",
     team: "Engineering",
     amountUsd: 120,
+    spendContributionUsd: 980,
     expectedVerdict: "approval_required",
     expectedClauses: ["providers.new_provider_rule"],
   },
@@ -203,6 +218,7 @@ export const events: Event[] = [
     timestamp: "Sun 11:44",
     type: "classification",
     description: "Inference tagged to internal tool misclassified as COGS",
+    spendContributionUsd: 170,
     expectedVerdict: "approved",
     expectedClauses: ["classification.rules"],
   },
@@ -214,6 +230,7 @@ export const events: Event[] = [
       "Month-to-date AI spend at 87% of company envelope, 9 days remaining",
     envelopePct: 87,
     daysRemaining: 9,
+    spendContributionUsd: 1260,
     expectedVerdict: "alert_burn",
     expectedClauses: ["budgets.burn_alert_pct"],
   },
@@ -222,6 +239,7 @@ export const events: Event[] = [
     timestamp: "Sun 23:59",
     type: "week_close",
     description: "Weekly rollup",
+    spendContributionUsd: 0,
     expectedVerdict: "week_closed",
     expectedClauses: [],
   },

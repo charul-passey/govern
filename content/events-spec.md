@@ -70,8 +70,8 @@ TALLY STRIP (animated count-up; values are engine-derived, asserted in tests):
   $840/yr consolidation identified (e10)
   1 agent caught
   0 human review-hours spent
-  Closing line (small type): Every verdict above traces to a clause you can read in the
-  policy JSON. That is the difference between a dashboard and a policy engine.
+  Closing line (small type): Every verdict in this feed traces to a clause you can
+  read in the policy JSON. That is the difference between a dashboard and a policy engine.
 
 UI RULES:
 - Events play at ~1.5s intervals; replay button afterward.

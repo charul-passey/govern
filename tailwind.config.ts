@@ -33,11 +33,16 @@ const config: Config = {
           "0%": { backgroundColor: "rgb(228 242 34 / 0.5)" },
           "100%": { backgroundColor: "rgb(228 242 34 / 0)" },
         },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         // simulator cards slide-fade in; changed JSON values flash once
         "slide-fade-in": "slide-fade-in 150ms ease-out",
         "value-flash": "value-flash 800ms ease-out",
+        "fade-in": "fade-in 400ms ease-out",
       },
     },
   },

@@ -1,42 +1,6 @@
 import { Fragment } from "react";
 import type { PolicyCore } from "@/lib/policy-schema";
 
-// Leaf paths whose value differs between two policies. Path scheme matches the
-// renderer: object -> `${path}.${key}`, array -> `${path}.${index}`. The
-// rationales subtree is excluded: it is prose that always changes, so flashing it
-// would be noise, and this keeps the phase-two rationale attach from flashing.
-function diffPaths(
-  a: unknown,
-  b: unknown,
-  path = "",
-  acc = new Set<string>(),
-): Set<string> {
-  if (path === "rationales") return acc;
-  if (a === b) return acc;
-  if (
-    typeof a !== "object" ||
-    typeof b !== "object" ||
-    a === null ||
-    b === null
-  ) {
-    acc.add(path);
-    return acc;
-  }
-  const keys = new Set([
-    ...Object.keys(a as object),
-    ...Object.keys(b as object),
-  ]);
-  for (const k of keys) {
-    diffPaths(
-      (a as Record<string, unknown>)[k],
-      (b as Record<string, unknown>)[k],
-      path ? `${path}.${k}` : k,
-      acc,
-    );
-  }
-  return acc;
-}
-
 const KEY = "text-ink";
 const STR = "text-ink/60";
 const VAL = "text-ink/80";
@@ -91,7 +55,9 @@ function render(
       {entries.map(([k, v], i) => (
         <Fragment key={k}>
           {padIn}
-          <span className={KEY}>{JSON.stringify(k)}</span>
+          <span className={KEY} data-json-path={path ? `${path}.${k}` : k}>
+            {JSON.stringify(k)}
+          </span>
           <span className={PUNC}>: </span>
           {render(v, changed, path ? `${path}.${k}` : k, indent + 1)}
           {i < entries.length - 1 ? <span className={PUNC}>,</span> : null}
@@ -106,12 +72,11 @@ function render(
 
 export function PolicyJson({
   policy,
-  prevPolicy,
+  changed,
 }: {
   policy: PolicyCore;
-  prevPolicy: PolicyCore | null;
+  changed: Set<string>;
 }) {
-  const changed = prevPolicy ? diffPaths(prevPolicy, policy) : new Set<string>();
   return (
     <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-ink/80">
       {render(policy, changed, "", 0)}
