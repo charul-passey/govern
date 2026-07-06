@@ -9,6 +9,7 @@ export function Hero() {
     <section id="hero" className="bg-ground px-6 py-20 sm:py-32">
       <div className="mx-auto max-w-shell">
         <div className="max-w-prose">
+          <div className="mb-5 h-2 w-16 bg-accent" aria-hidden="true" />
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-ink sm:text-6xl">
             Every company just hired a third workforce. Nobody’s managing its
             budget.
